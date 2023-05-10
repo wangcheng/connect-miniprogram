@@ -10,6 +10,7 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "declaration": true,
     "types": ["miniprogram-api-typings"]
   }

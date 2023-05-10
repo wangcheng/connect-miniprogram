@@ -15,7 +15,9 @@
     "ix": "^5.0.0"
   },
   "devDependencies": {
+    "jest": "^29.5.0",
     "miniprogram-api-typings": "^3.9.1",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   }
 }
