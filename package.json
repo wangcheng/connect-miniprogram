@@ -1,0 +1,15 @@
+{
+  "name": "connect-miniprogram",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/wangcheng/connect-miniprogram.git",
+  "author": "Cheng Wang <wangcheng678@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@bufbuild/connect": "^0.8.6",
+    "@bufbuild/protobuf": "^1.2.0",
+    "headers-polyfill": "^3.1.2",
+    "ix": "^5.0.0",
+    "miniprogram-api-typings": "^3.9.1"
+  }
+}
