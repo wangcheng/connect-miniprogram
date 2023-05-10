@@ -103,7 +103,7 @@ export function createGrpcWebTransport(
     const finalHeader = headersToObject(
       requestHeader(useBinaryFormat, timeoutMs, reqHeader),
     );
-    const body = await createRequestBody(reqMessage, serialize);
+    const body = await createRequestBody(reqMessage, serialize, method);
     const { header, messageStream } = await requestAsAsyncIterable({
       url,
       header: finalHeader,

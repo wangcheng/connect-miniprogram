@@ -124,7 +124,7 @@ export function createConnectTransport(
     const finalHeader = headersToObject(
       requestHeader(method.kind, useBinaryFormat, timeoutMs, reqHeader),
     );
-    const body = await createRequestBody(message, serialize);
+    const body = await createRequestBody(message, serialize, method);
     const { header, messageStream } = await requestAsAsyncIterable({
       url,
       header: finalHeader,
