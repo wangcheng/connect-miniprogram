@@ -13,17 +13,11 @@ function polyfill(target: any = global || window) {
 
 try {
   polyfill();
-} catch (e) {
-  console.log(1);
-}
+} catch (e) {}
 try {
   polyfill(GameGlobal);
-} catch (e) {
-  console.log(2);
-}
+} catch (e) {}
 try {
   window = window || {};
   polyfill(window);
-} catch (e) {
-  console.log(3);
-}
+} catch (e) {}
