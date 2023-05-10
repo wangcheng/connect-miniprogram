@@ -16,7 +16,6 @@ import type {
 import {
   createClientMethodSerializers,
   createMethodUrl,
-  encodeEnvelope,
 } from '@bufbuild/connect/protocol';
 import {
   requestHeader,
@@ -25,7 +24,8 @@ import {
   errorFromJson,
 } from '@bufbuild/connect/protocol-connect';
 
-import { parseResponseBody, createRequestAsAsyncIterable } from './stream';
+import { createWxRequestAsAsyncGenerator } from './wx-request';
+import { parseResponseBody, createRequestBody } from './message-body';
 
 import { CreateTransportOptions } from './types';
 
@@ -100,12 +100,12 @@ export function createConnectTransport(
     });
   };
 
-  const requestAsAsyncIterable = createRequestAsAsyncIterable(
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
     options.request,
     options.requestOptions,
   );
 
-  const stream = function <I extends Message<I>, O extends Message<O>>(
+  async function stream<I extends Message<I>, O extends Message<O>>(
     service: ServiceType,
     method: MethodInfo<I, O>,
     _signal: AbortSignal | undefined,
@@ -120,40 +120,26 @@ export function createConnectTransport(
       options.binaryOptions,
     );
 
-    async function createRequestBody(
-      input: AsyncIterable<I>,
-    ): Promise<Uint8Array> {
-      const r = await input[Symbol.asyncIterator]().next();
-      if (r.done == true) {
-        throw 'missing request message';
-      }
-      return encodeEnvelope(0, serialize(r.value));
-    }
-
     const url = createMethodUrl(options.baseUrl, service, method);
     const finalHeader = headersToObject(
       requestHeader(method.kind, useBinaryFormat, timeoutMs, reqHeader),
     );
-    return createRequestBody(message)
-      .then((body) =>
-        requestAsAsyncIterable({
-          url,
-          header: finalHeader,
-          data: body.buffer,
-        }),
-      )
-      .then((r) => {
-        const trailerTarget = new Headers();
-        return {
-          service,
-          method,
-          stream: true,
-          header: r.header,
-          trailer: trailerTarget,
-          message: parseResponseBody(r.stream, trailerTarget, parse),
-        };
-      });
-  };
+    const body = await createRequestBody(message, serialize);
+    const { header, messageStream } = await requestAsAsyncIterable({
+      url,
+      header: finalHeader,
+      data: body.buffer,
+    });
+    const trailerTarget = new Headers();
+    return {
+      service,
+      method,
+      stream: true,
+      header,
+      trailer: trailerTarget,
+      message: parseResponseBody(messageStream, trailerTarget, parse),
+    };
+  }
 
   return {
     unary,
