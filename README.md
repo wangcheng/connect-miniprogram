@@ -31,7 +31,7 @@ const connectTransport = createConnectTransport({
 });
 
 // You can also use create a grpc-web transport. The usage is the same.
-const createGrpcWebTransport = createGrpcWebTransport({
+const grpcWebTransport = createGrpcWebTransport({
   baseUrl: 'https://demo.connect.build',
   request: wx.request,
 });
@@ -47,20 +47,6 @@ async function unary() {
 
 async function serverStream() {
   for await (const res of client.introduce({ name: 'Joseph' })) {
-    console.log(res);
-  }
-}
-
-async function biDirectionalStream() {
-  async function* streamReq() {
-    yield {
-      sentence: 'Hi!',
-    };
-    yield {
-      sentence: 'My name is Emily.',
-    };
-  }
-  for await (const res of client.converse(streamReq())) {
     console.log(res);
   }
 }
