@@ -26,7 +26,14 @@ async function unary() {
 }
 
 async function serverStream() {
-  for await (const res of client.introduce({ name: 'Joseph' })) {
+  for await (const res of client.introduce(
+    { name: 'Joseph' },
+    {
+      onHeader: (res) => {
+        console.log('onHeader', res);
+      },
+    },
+  )) {
     console.log(res);
   }
 }

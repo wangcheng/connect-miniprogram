@@ -7,11 +7,18 @@ import type {
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
-import { Code, appendHeaders, connectErrorFromReason } from '@bufbuild/connect';
+import {
+  Code,
+  appendHeaders,
+  connectErrorFromReason,
+  runUnary,
+  runStreaming,
+} from '@bufbuild/connect';
 import type {
   StreamResponse,
   Transport,
   UnaryResponse,
+  UnaryRequest,
 } from '@bufbuild/connect';
 import {
   createClientMethodSerializers,
@@ -33,7 +40,7 @@ export function createConnectTransport(
   options: CreateTransportOptions,
 ): Transport {
   const useBinaryFormat = options.useBinaryFormat ?? false;
-  function unary<
+  async function unary<
     I extends Message<I> = AnyMessage,
     O extends Message<O> = AnyMessage,
   >(
@@ -50,55 +57,61 @@ export function createConnectTransport(
       options.jsonOptions,
       options.binaryOptions,
     );
-    const url = createMethodUrl(options.baseUrl, service, method);
-    const finalHeader = headersToObject(
-      requestHeader(method.kind, useBinaryFormat, timeoutMs, header),
-    );
-
-    const req = serialize(normalize(message));
-    return new Promise<UnaryResponse<I, O>>((resolve, reject) => {
-      const onSuccess = (response) => {
-        const headers = new Headers(response.header);
-        const { isUnaryError, unaryError } = validateResponse(
-          method.kind,
-          useBinaryFormat,
-          response.statusCode,
-          headers,
-        );
-        if (isUnaryError) {
-          reject(
-            errorFromJson(
-              response.data as JsonValue,
+    return await runUnary<I, O>(
+      {
+        stream: false,
+        service,
+        method,
+        url: createMethodUrl(options.baseUrl, service, method),
+        init: {},
+        header: requestHeader(method.kind, useBinaryFormat, timeoutMs, header),
+        message: normalize(message),
+        signal: _signal as AbortSignal,
+      },
+      (req: UnaryRequest<I, O>): Promise<UnaryResponse<I, O>> =>
+        new Promise<WechatMiniprogram.RequestSuccessCallbackResult>(
+          (resolve, reject) => {
+            options.request({
+              url: req.url,
+              header: headersToObject(req.header),
+              method: 'POST',
+              data: serialize(req.message).buffer,
+              responseType: 'arraybuffer',
+              ...options.requestOptions,
+              success: resolve,
+              fail: (e) => {
+                reject(connectErrorFromReason(e, Code.Internal));
+              },
+            });
+          },
+        ).then((res) => {
+          const headers = new Headers(res.header);
+          const { isUnaryError, unaryError } = validateResponse(
+            method.kind,
+            useBinaryFormat,
+            res.statusCode,
+            headers,
+          );
+          if (isUnaryError) {
+            throw errorFromJson(
+              res.data as JsonValue,
               appendHeaders(...trailerDemux(headers)),
               unaryError,
-            ),
-          );
-        }
-        const [demuxedHeader, demuxedTrailer] = trailerDemux(headers);
-        const result: UnaryResponse<I, O> = {
-          service,
-          header: demuxedHeader as any as Headers,
-          trailer: demuxedTrailer as any as Headers,
-          stream: false,
-          method,
-          message: parse(new Uint8Array(response.data as ArrayBuffer)),
-        };
-        resolve(result);
-      };
-
-      options.request({
-        url,
-        header: finalHeader,
-        method: 'POST',
-        data: req.buffer,
-        responseType: 'arraybuffer',
-        ...options.requestOptions,
-        success: onSuccess,
-        fail: (e) => {
-          reject(connectErrorFromReason(e, Code.Internal));
-        },
-      });
-    });
+            );
+          }
+          const [demuxedHeader, demuxedTrailer] = trailerDemux(headers);
+          const result: UnaryResponse<I, O> = {
+            service,
+            header: demuxedHeader as any as Headers,
+            trailer: demuxedTrailer as any as Headers,
+            stream: false,
+            method,
+            message: parse(new Uint8Array(res.data as ArrayBuffer)),
+          };
+          return result;
+        }),
+      [],
+    );
   }
 
   const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
@@ -120,26 +133,41 @@ export function createConnectTransport(
       options.jsonOptions,
       options.binaryOptions,
     );
-
-    const url = createMethodUrl(options.baseUrl, service, method);
-    const finalHeader = headersToObject(
-      requestHeader(method.kind, useBinaryFormat, timeoutMs, reqHeader),
+    return runStreaming<I, O>(
+      {
+        stream: true,
+        service,
+        method,
+        url: createMethodUrl(options.baseUrl, service, method),
+        init: {},
+        signal: _signal as AbortSignal,
+        header: requestHeader(
+          method.kind,
+          useBinaryFormat,
+          timeoutMs,
+          reqHeader,
+        ),
+        message,
+      },
+      async (req) => {
+        const body = await createRequestBody(message, serialize, method);
+        const { header, messageStream } = await requestAsAsyncIterable({
+          url: req.url,
+          header: headersToObject(req.header),
+          data: body.buffer,
+        });
+        const trailerTarget = new Headers();
+        return {
+          service,
+          method,
+          stream: true,
+          header,
+          trailer: trailerTarget,
+          message: parseResponseBody(messageStream, trailerTarget, parse),
+        };
+      },
+      [],
     );
-    const body = await createRequestBody(message, serialize, method);
-    const { header, messageStream } = await requestAsAsyncIterable({
-      url,
-      header: finalHeader,
-      data: body.buffer,
-    });
-    const trailerTarget = new Headers();
-    return {
-      service,
-      method,
-      stream: true,
-      header,
-      trailer: trailerTarget,
-      message: parseResponseBody(messageStream, trailerTarget, parse),
-    };
   }
 
   return {
