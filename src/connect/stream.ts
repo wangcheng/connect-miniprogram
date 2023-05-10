@@ -11,14 +11,7 @@ import {
 } from '@bufbuild/connect/protocol-grpc-web';
 import { Code, connectErrorFromReason, ConnectError } from '@bufbuild/connect';
 
-export interface AdditionalRequestOptions {
-  enableHttp2: boolean;
-  enableQuic: boolean;
-  enableCache: boolean;
-  enableHttpDNS: boolean;
-  httpDNSServiceId: string;
-  forceCellularNetwork: boolean;
-}
+import { AdditionalRequestOptions } from './types';
 
 type ChunkOrHeader = Headers | Uint8Array;
 

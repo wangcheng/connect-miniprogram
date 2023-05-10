@@ -2,10 +2,6 @@ import { headersToObject } from 'headers-polyfill';
 import { Message } from '@bufbuild/protobuf';
 import type {
   AnyMessage,
-  BinaryReadOptions,
-  BinaryWriteOptions,
-  JsonReadOptions,
-  JsonWriteOptions,
   MethodInfo,
   PartialMessage,
   ServiceType,
@@ -26,48 +22,12 @@ import {
   parseGrpcWebUaryResponseBody,
   parseGrpcWebResponseBody,
   createRequestAsAsyncIterable,
-  AdditionalRequestOptions,
 } from './stream';
 
-interface GrpcWebTransportOptions {
-  request: typeof wx.request;
-
-  /**
-   * Base URI for all HTTP requests.
-   *
-   * Requests will be made to <baseUrl>/<package>.<service>/method
-   *
-   * Example: `baseUrl: "https://example.com/my-api"`
-   *
-   * This will make a `POST /my-api/my_package.MyService/Foo` to
-   * `example.com` via HTTPS.
-   *
-   * If your API is served from the same domain as your site, use
-   * `baseUrl: window.location.origin` or simply "/".
-   */
-  baseUrl: string;
-
-  /**
-   * By default, clients use the binary format for gRPC-web, because
-   * not all gRPC-web implementations support JSON.
-   */
-  useBinaryFormat?: boolean;
-
-  /**
-   * Options for the JSON format.
-   */
-  jsonOptions?: Partial<JsonReadOptions & JsonWriteOptions>;
-
-  /**
-   * Options for the binary wire format.
-   */
-  binaryOptions?: Partial<BinaryReadOptions & BinaryWriteOptions>;
-
-  requestOptions?: AdditionalRequestOptions;
-}
+import { CreateTransportOptions } from './types';
 
 export function createGrpcWebTransport(
-  options: GrpcWebTransportOptions,
+  options: CreateTransportOptions,
 ): Transport {
   const useBinaryFormat = options.useBinaryFormat ?? true;
 
