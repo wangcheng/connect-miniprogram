@@ -1,7 +1,8 @@
 {
   "name": "connect-miniprogram",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
+  "files": ["dist"],
   "repository": "https://github.com/wangcheng/connect-miniprogram.git",
   "author": "Cheng Wang <wangcheng678@gmail.com>",
   "license": "MIT",
