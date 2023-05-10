@@ -1,0 +1,16 @@
+{
+  "name": "connect-miniprogram-example",
+  "private": true,
+  "scripts": {
+    "dev": "remax build -t wechat -w",
+    "build": "NODE_ENV=production remax build -t wechat"
+  },
+  "dependencies": {
+    "@buf/bufbuild_eliza.bufbuild_connect-es": "^0.8.6-20221224180530-f3801d450ef9.1",
+    "react": "^17.0.0",
+    "remax": "^2.15.14"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.16"
+  }
+}
