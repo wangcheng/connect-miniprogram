@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
+    "outDir": "dist",
     "target": "ESNext",
     "moduleResolution": "node",
     "noImplicitAny": false,
-    "outDir": "lib",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "sourceMap": true,
+    "skipLibCheck": true,
+    "declaration": true,
     "types": ["miniprogram-api-typings"]
   }
 }
