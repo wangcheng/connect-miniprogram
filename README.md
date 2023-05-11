@@ -52,7 +52,8 @@ async function serverStream() {
 }
 ```
 
-## Differences with @bufbuild/connect-web
+## Limitations
 
-- Doesn't support interceptor
-- Doesn't support AbortSignal
+- Doesn't support interceptor (yet). I will add this support in the future.
+- Doesn't support `AbortSignal` because Wexin doesn't have `AbortSignal` API.
+- Doesn't support stream request body because either `fetch` or Wexin dosen't support sending stream request.
