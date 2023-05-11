@@ -2,7 +2,9 @@
   "name": "connect-miniprogram",
   "version": "1.0.1",
   "main": "dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "repository": "https://github.com/wangcheng/connect-miniprogram.git",
   "author": "Cheng Wang <wangcheng678@gmail.com>",
   "license": "MIT",
@@ -10,12 +12,15 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@bufbuild/connect": "^0.8.6",
     "@bufbuild/protobuf": "^1.2.0",
     "headers-polyfill": "^3.1.2",
     "ix": "^5.0.0"
   },
+  "peerDependencies": {
+    "@bufbuild/connect": "^0.8.6"
+  },
   "devDependencies": {
+    "@bufbuild/connect": "^0.8.6",
     "jest": "^29.5.0",
     "miniprogram-api-typings": "^3.9.1",
     "ts-jest": "^29.1.0",
