@@ -33,7 +33,7 @@ export function createConnectTransport(
   options: CreateTransportOptions,
 ): Transport {
   const useBinaryFormat = options.useBinaryFormat ?? false;
-  const unary = function <
+  function unary<
     I extends Message<I> = AnyMessage,
     O extends Message<O> = AnyMessage,
   >(
@@ -44,19 +44,47 @@ export function createConnectTransport(
     header: Record<string, string> | undefined,
     message: PartialMessage<I>,
   ): Promise<UnaryResponse<I, O>> {
-    return new Promise<UnaryResponse<I, O>>((resolve, reject) => {
-      const { normalize, serialize, parse } = createClientMethodSerializers(
-        method,
-        useBinaryFormat,
-        options.jsonOptions,
-        options.binaryOptions,
-      );
-      const url = createMethodUrl(options.baseUrl, service, method);
-      const finalHeader = headersToObject(
-        requestHeader(method.kind, useBinaryFormat, timeoutMs, header),
-      );
+    const { normalize, serialize, parse } = createClientMethodSerializers(
+      method,
+      useBinaryFormat,
+      options.jsonOptions,
+      options.binaryOptions,
+    );
+    const url = createMethodUrl(options.baseUrl, service, method);
+    const finalHeader = headersToObject(
+      requestHeader(method.kind, useBinaryFormat, timeoutMs, header),
+    );
 
-      const req = serialize(normalize(message));
+    const req = serialize(normalize(message));
+    return new Promise<UnaryResponse<I, O>>((resolve, reject) => {
+      const onSuccess = (response) => {
+        const headers = new Headers(response.header);
+        const { isUnaryError, unaryError } = validateResponse(
+          method.kind,
+          useBinaryFormat,
+          response.statusCode,
+          headers,
+        );
+        if (isUnaryError) {
+          reject(
+            errorFromJson(
+              response.data as JsonValue,
+              appendHeaders(...trailerDemux(headers)),
+              unaryError,
+            ),
+          );
+        }
+        const [demuxedHeader, demuxedTrailer] = trailerDemux(headers);
+        const result: UnaryResponse<I, O> = {
+          service,
+          header: demuxedHeader as any as Headers,
+          trailer: demuxedTrailer as any as Headers,
+          stream: false,
+          method,
+          message: parse(new Uint8Array(response.data as ArrayBuffer)),
+        };
+        resolve(result);
+      };
 
       options.request({
         url,
@@ -65,40 +93,13 @@ export function createConnectTransport(
         data: req.buffer,
         responseType: 'arraybuffer',
         ...options.requestOptions,
-        success: (response) => {
-          const headers = new Headers(response.header);
-          const { isUnaryError, unaryError } = validateResponse(
-            method.kind,
-            useBinaryFormat,
-            response.statusCode,
-            headers,
-          );
-          if (isUnaryError) {
-            reject(
-              errorFromJson(
-                response.data as JsonValue,
-                appendHeaders(...trailerDemux(headers)),
-                unaryError,
-              ),
-            );
-          }
-          const [demuxedHeader, demuxedTrailer] = trailerDemux(headers);
-          const result: UnaryResponse<I, O> = {
-            service,
-            header: demuxedHeader as any as Headers,
-            trailer: demuxedTrailer as any as Headers,
-            stream: false,
-            method,
-            message: parse(new Uint8Array(response.data as ArrayBuffer)),
-          };
-          resolve(result);
-        },
+        success: onSuccess,
         fail: (e) => {
           reject(connectErrorFromReason(e, Code.Internal));
         },
       });
     });
-  };
+  }
 
   const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
     options.request,
