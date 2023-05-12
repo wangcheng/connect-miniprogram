@@ -25,8 +25,8 @@ import {
 } from '@bufbuild/connect/protocol-connect';
 
 import { createWxRequestAsAsyncGenerator } from './wx-request';
-import { parseResponseBody, createRequestBody } from './message-body';
-
+import { parseResponseBody } from './message-body/parse-connect';
+import { createRequestBody } from './message-body/create';
 import { CreateTransportOptions } from './types';
 
 export function createConnectTransport(
