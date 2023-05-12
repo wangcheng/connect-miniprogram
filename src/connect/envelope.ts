@@ -12,11 +12,9 @@ export async function* createEnvelopeAsyncGenerator(
     n.set(chunk, buffer.length);
     buffer = n;
   }
-
-  let header: { length: number; flags: number } | undefined = undefined;
-  for await (const chunk of stream) {
-    append(chunk);
-    for (;;) {
+  for (;;) {
+    let header: { length: number; flags: number } | undefined;
+    innerloop: for (;;) {
       if (header === undefined && buffer.byteLength >= 5) {
         let length = 0;
         for (let i = 1; i < 5; i++) {
@@ -25,19 +23,25 @@ export async function* createEnvelopeAsyncGenerator(
         header = { flags: buffer[0], length };
       }
       if (header !== undefined && buffer.byteLength >= header.length + 5) {
-        const data = buffer.subarray(5, 5 + header.length);
-        buffer = buffer.subarray(5 + header.length);
-        yield {
-          flags: header.flags,
-          data,
-        };
-        header = undefined;
-      } else {
+        break innerloop;
+      }
+      const result = await stream.next();
+      if (result.done) {
+        break innerloop;
+      }
+      append(result.value);
+    }
+    if (header === undefined) {
+      if (buffer.byteLength == 0) {
         break;
       }
+      throw new ConnectError('premature end of stream', Code.DataLoss);
     }
-  }
-  if (header !== undefined) {
-    throw new ConnectError('premature end of stream', Code.DataLoss);
+    const data = buffer.subarray(5, 5 + header.length);
+    buffer = buffer.subarray(5 + header.length);
+    yield {
+      flags: header.flags,
+      data,
+    };
   }
 }

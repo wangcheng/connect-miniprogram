@@ -16,15 +16,18 @@ import {
   createMethodUrl,
   encodeEnvelope,
 } from '@bufbuild/connect/protocol';
-import { requestHeader } from '@bufbuild/connect/protocol-grpc-web';
+import {
+  requestHeader,
+  validateResponse,
+} from '@bufbuild/connect/protocol-grpc-web';
 
 import { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 import {
-  createRequestBody,
-  parseGrpcWebUaryResponseBody,
-  parseGrpcWebResponseBody,
-} from './message-body';
+  parseStreamResponseBody,
+  parseUaryResponseBody,
+} from './message-body/parse-grpc';
+import { createRequestBody } from './message-body/create';
 
 export function createGrpcWebTransport(
   options: CreateTransportOptions,
@@ -60,17 +63,16 @@ export function createGrpcWebTransport(
 
     const req = encodeEnvelope(0, serialize(normalize(reqMessage)));
 
-    const { header, messageStream } = await requestAsAsyncIterable({
+    const { header, messageStream, statusCode } = await requestAsAsyncIterable({
       url,
       header: finalHeader,
       data: req.buffer,
     });
 
-    const trailerTarget = new Headers();
+    validateResponse(useBinaryFormat, statusCode, header);
 
-    const message = await parseGrpcWebUaryResponseBody(
+    const { trailer, message } = await parseUaryResponseBody(
       messageStream,
-      trailerTarget,
       parse,
     );
 
@@ -79,7 +81,7 @@ export function createGrpcWebTransport(
       method,
       stream: false,
       header,
-      trailer: trailerTarget,
+      trailer,
       message,
     };
   }
@@ -104,19 +106,25 @@ export function createGrpcWebTransport(
       requestHeader(useBinaryFormat, timeoutMs, reqHeader),
     );
     const body = await createRequestBody(reqMessage, serialize, method);
-    const { header, messageStream } = await requestAsAsyncIterable({
+    const { header, messageStream, statusCode } = await requestAsAsyncIterable({
       url,
       header: finalHeader,
       data: body.buffer,
     });
 
+    const { foundStatus } = validateResponse(
+      useBinaryFormat,
+      statusCode,
+      header,
+    );
+
     const trailerTarget = new Headers();
 
-    const message = await parseGrpcWebResponseBody(
+    const message = await parseStreamResponseBody(
       messageStream,
+      foundStatus,
       trailerTarget,
       parse,
-      false,
     );
 
     return {
