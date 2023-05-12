@@ -3,7 +3,8 @@
   "version": "1.0.3",
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "fast-text-encoding.js"
   ],
   "repository": "https://github.com/wangcheng/connect-miniprogram.git",
   "author": "Cheng Wang <wangcheng678@gmail.com>",
