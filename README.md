@@ -4,9 +4,17 @@ A [Connect](https://connect.build/docs/introduction/) client for Wexin Miniprogr
 
 适配小程序的 [Connect](https://connect.build/docs/introduction/) 客户端。可以在小程序中使用访问 Connect 生成的服务。支持 GRPC 和流式请求。
 
-## Headers API polyfill
+## Polyfill
 
-Connect rely on [Headers API](https://developer.mozilla.org/en-US/docs/Web/API/Headers) which is not supported in Weixin.This project comes with a polyfill using [mswjs/headers-polyfill](https://github.com/mswjs/headers-polyfill). Remember to import the file in the entry of your project.
+Connect libraries relys on some APIs that not provided in Wexin environment.
+
+| API                                                                         | Polyfilled by                                                               |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)         | [mswjs/headers-polyfill](https://github.com/mswjs/headers-polyfill)         |
+| [TextEncoder](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) | [samthor/fast-text-encoding](https://github.com/samthor/fast-text-encoding) |
+| [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) | [samthor/fast-text-encoding](https://github.com/samthor/fast-text-encoding) |
+
+Import the polyfill at the start of your code:
 
 ```js
 import 'connect-miniprogram/polyfill';
