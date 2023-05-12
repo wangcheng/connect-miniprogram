@@ -1,7 +1,6 @@
-import { fromEventPattern } from 'ix/asynciterable/fromeventpattern';
-
 import { AdditionalRequestOptions } from './types';
 import { createEnvelopeAsyncGenerator } from './envelope';
+import { createAsyncGeneratorFromEventPattern } from './async-generator';
 
 export type PartialOptions = Pick<
   WechatMiniprogram.RequestOption,
@@ -16,59 +15,52 @@ export interface GeneralEvent<N extends string, T> {
 type ChunkReceivedEvent = GeneralEvent<'ChunkReceived', { data: ArrayBuffer }>;
 type HeadersReceivedEvent = GeneralEvent<
   'HeadersReceived',
-  { header: Record<string, string> }
+  { header: Record<string, string>; statusCode: number; cookies: string }
 >;
 
-type RequestEvent =
-  | HeadersReceivedEvent
-  | ChunkReceivedEvent
-  | GeneralEvent<'Success', WechatMiniprogram.RequestSuccessCallbackResult>
-  | GeneralEvent<'Fail', WechatMiniprogram.Err>;
+type RequestEvent = HeadersReceivedEvent | ChunkReceivedEvent;
+
+export class WeixinRequestError extends Error {
+  errno: number;
+  constructor(err: WechatMiniprogram.Err) {
+    super(err.errMsg);
+    this.errno = err.errno;
+  }
+}
 
 function create(
   request: typeof wx.request,
   requestOptions?: AdditionalRequestOptions,
 ) {
-  return async function* wxRequestToAsyncIterable(options: PartialOptions) {
-    let task: WechatMiniprogram.RequestTask;
+  return (options: PartialOptions) => {
+    const generator = createAsyncGeneratorFromEventPattern<
+      HeadersReceivedEvent | ChunkReceivedEvent
+    >(({ handleValue, handleEnd, handleError }) => {
+      const task = request({
+        ...options,
+        ...requestOptions,
+        method: 'POST',
+        responseType: 'arraybuffer',
+        enableChunked: true,
+        success: handleEnd,
+        fail: (e) => handleError(new WeixinRequestError(e)),
+      });
 
-    const asyncIterable: AsyncIterable<RequestEvent> = fromEventPattern(
-      (handler) => {
-        task = request({
-          ...options,
-          ...requestOptions,
-          method: 'POST',
-          responseType: 'arraybuffer',
-          enableChunked: true,
-          success: (res) => {
-            handler({ name: 'Success', payload: res });
-          },
-          fail: (error) => {
-            handler({ name: 'Fail', payload: error });
-          },
-        });
-        task.onChunkReceived((res) =>
-          handler({ name: 'ChunkReceived', payload: res }),
-        );
-        task.onHeadersReceived((res) =>
-          handler({ name: 'HeadersReceived', payload: res }),
-        );
-      },
-      () => {
+      task.onChunkReceived((res: any) => {
+        handleValue({ name: 'ChunkReceived', payload: res });
+      });
+
+      task.onHeadersReceived((res: any) => {
+        handleValue({ name: 'HeadersReceived', payload: res });
+      });
+
+      return () => {
         task.offChunkReceived();
         task.offHeadersReceived();
-      },
-    );
+      };
+    });
 
-    for await (const res of asyncIterable) {
-      if (res.name === 'Success') {
-        break;
-      }
-      if (res.name === 'Fail') {
-        throw res.payload;
-      }
-      yield res;
-    }
+    return generator();
   };
 }
 
@@ -84,7 +76,8 @@ async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
   }
 
   return {
-    header: new Headers(headerChunk.payload.header),
+    statusCode: headerChunk.payload.statusCode,
+    header: new Headers(headerChunk?.payload.header),
     messageStream: createEnvelopeAsyncGenerator(messageStream()),
   };
 }
