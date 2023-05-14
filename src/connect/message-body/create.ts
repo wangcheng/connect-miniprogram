@@ -7,7 +7,7 @@ export async function createRequestBody<I>(
   method,
 ): Promise<Uint8Array> {
   if (method.kind != MethodKind.ServerStreaming) {
-    throw 'Wexin does not support streaming request bodies';
+    throw 'Weixin does not support streaming request bodies';
   }
   const r = await input[Symbol.asyncIterator]().next();
   if (r.done == true) {
