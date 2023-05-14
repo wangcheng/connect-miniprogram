@@ -15,7 +15,7 @@ export interface GeneralEvent<N extends string, T> {
 type ChunkReceivedEvent = GeneralEvent<'ChunkReceived', { data: ArrayBuffer }>;
 type HeadersReceivedEvent = GeneralEvent<
   'HeadersReceived',
-  { header: Record<string, string>; statusCode: number; cookies: string }
+  { header: Record<string, string>; statusCode: number; cookies: string[] }
 >;
 
 type RequestEvent = HeadersReceivedEvent | ChunkReceivedEvent;
@@ -26,6 +26,40 @@ export class WeixinRequestError extends Error {
     super(err.errMsg);
     this.errno = err.errno;
   }
+}
+
+function createWithoutChunked(
+  request: typeof wx.request,
+  requestOptions?: AdditionalRequestOptions,
+) {
+  return (options: PartialOptions) => {
+    const generator = createAsyncGeneratorFromEventPattern<
+      HeadersReceivedEvent | ChunkReceivedEvent
+    >(({ handleValue, handleEnd, handleError }) => {
+      request({
+        ...options,
+        ...requestOptions,
+        method: 'POST',
+        responseType: 'arraybuffer',
+        success: ({ header, statusCode, data, cookies }) => {
+          handleValue({
+            name: 'HeadersReceived',
+            payload: { header, statusCode, cookies },
+          });
+          handleValue({
+            name: 'ChunkReceived',
+            payload: { data: data as ArrayBuffer },
+          });
+          handleEnd();
+        },
+        fail: (e) => handleError(new WeixinRequestError(e)),
+      });
+
+      return () => {};
+    });
+
+    return generator();
+  };
 }
 
 function create(
@@ -86,6 +120,13 @@ export function createWxRequestAsAsyncGenerator(
   request: typeof wx.request,
   requestOptions?: AdditionalRequestOptions,
 ) {
-  const reqFn = create(request, requestOptions);
+  /**
+   * Wechat devtool has a bug if enableChunked is true.
+   * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
+   */
+  const isDevTool = wx.getSystemInfoSync().platform === 'devtools';
+  const reqFn = isDevTool
+    ? createWithoutChunked(request, requestOptions)
+    : create(request, requestOptions);
   return (options: PartialOptions) => demuxStream(reqFn(options));
 }

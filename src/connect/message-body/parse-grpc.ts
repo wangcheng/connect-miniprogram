@@ -65,8 +65,7 @@ export async function parseUaryResponseBody<O>(
   let message: O | undefined;
   for await (const chunk of input) {
     const { flags, data } = chunk;
-    // FIXME: the original code is "flags === trailerFlag". it doesn't work. the real flags is 253
-    if ((flags & trailerFlag) === trailerFlag) {
+    if (flags === trailerFlag) {
       if (trailer !== undefined) {
         throw 'extra trailer';
       }
