@@ -1,12 +1,12 @@
 # connect-miniprogram
 
-A [Connect](https://connect.build/docs/introduction/) client for Wexin Miniprogram
+A [Connect](https://connect.build/docs/introduction/) client for Weixin Miniprogram
 
 适配小程序的 [Connect](https://connect.build/docs/introduction/) 客户端。可以在小程序中使用访问 Connect 生成的服务。支持 GRPC 和流式请求。
 
 ## Polyfill
 
-Connect libraries relys on some APIs that not provided in Wexin environment.
+Connect libraries relys on some APIs that not provided in Weixin environment.
 
 | API                                                                         | Polyfilled by                                                               |
 | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -63,5 +63,5 @@ async function serverStream() {
 ## Limitations
 
 - Doesn't support interceptor (yet). I will add this support in the future.
-- Doesn't support `AbortSignal` because Wexin doesn't have `AbortSignal` API.
-- Doesn't support stream request body because either `fetch` or Wexin dosen't support sending stream request.
+- Doesn't support `AbortSignal` because Weixin doesn't have `AbortSignal` API.
+- Doesn't support stream request body because either `fetch` or Weixin dosen't support sending stream request.

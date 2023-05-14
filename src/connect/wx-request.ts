@@ -121,7 +121,7 @@ export function createWxRequestAsAsyncGenerator(
   requestOptions?: AdditionalRequestOptions,
 ) {
   /**
-   * Wechat devtool has a bug if enableChunked is true.
+   * Weixin devtool has a bug if enableChunked is true.
    * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
    */
   const isDevTool = wx.getSystemInfoSync().platform === 'devtools';
