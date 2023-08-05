@@ -1,13 +1,13 @@
 import { headersToObject } from 'headers-polyfill';
-import { Message } from '@bufbuild/protobuf';
 import type {
+  Message,
   AnyMessage,
   JsonValue,
   MethodInfo,
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
-import { Code, appendHeaders, connectErrorFromReason } from '@bufbuild/connect';
+import { Code, appendHeaders, ConnectError } from '@bufbuild/connect';
 import type {
   StreamResponse,
   Transport,
@@ -18,16 +18,16 @@ import {
   createMethodUrl,
 } from '@bufbuild/connect/protocol';
 import {
-  requestHeader,
-  validateResponse,
-  trailerDemux,
   errorFromJson,
+  requestHeader,
+  trailerDemux,
+  validateResponse,
 } from '@bufbuild/connect/protocol-connect';
 
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 import { parseResponseBody } from './message-body/parse-connect';
 import { createRequestBody } from './message-body/create';
-import { CreateTransportOptions } from './types';
+import type { CreateTransportOptions } from './types';
 
 export function createConnectTransport(
   options: CreateTransportOptions,
@@ -61,7 +61,6 @@ export function createConnectTransport(
         const headers = new Headers(response.header);
         const { isUnaryError, unaryError } = validateResponse(
           method.kind,
-          useBinaryFormat,
           response.statusCode,
           headers,
         );
@@ -95,16 +94,13 @@ export function createConnectTransport(
         ...options.requestOptions,
         success: onSuccess,
         fail: (e) => {
-          reject(connectErrorFromReason(e, Code.Internal));
+          reject(ConnectError.from(e, Code.Internal));
         },
       });
     });
   }
 
-  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
-    options.request,
-    options.requestOptions,
-  );
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function stream<I extends Message<I>, O extends Message<O>>(
     service: ServiceType,

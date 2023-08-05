@@ -2,7 +2,7 @@ import { Headers } from 'headers-polyfill';
 import { FastTextDecoder, FastTextEncoder } from '../fast-text-encoding';
 
 declare global {
-  var GameGlobal: any;
+  const GameGlobal: unknown;
 }
 
 function polyfill(target: any = global || window) {
@@ -15,11 +15,17 @@ function polyfill(target: any = global || window) {
 
 try {
   polyfill();
-} catch (e) {}
+} catch (e) {
+  /* empty */
+}
 try {
   polyfill(GameGlobal);
-} catch (e) {}
+} catch (e) {
+  /* empty */
+}
 try {
   window = window || {};
   polyfill(window);
-} catch (e) {}
+} catch (e) {
+  /* empty */
+}

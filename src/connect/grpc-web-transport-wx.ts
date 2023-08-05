@@ -1,6 +1,6 @@
 import { headersToObject } from 'headers-polyfill';
-import { Message } from '@bufbuild/protobuf';
 import type {
+  Message,
   AnyMessage,
   MethodInfo,
   PartialMessage,
@@ -21,7 +21,7 @@ import {
   validateResponse,
 } from '@bufbuild/connect/protocol-grpc-web';
 
-import { CreateTransportOptions } from './types';
+import type { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 import {
   parseStreamResponseBody,
@@ -34,10 +34,7 @@ export function createGrpcWebTransport(
 ): Transport {
   const useBinaryFormat = options.useBinaryFormat ?? true;
 
-  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
-    options.request,
-    options.requestOptions,
-  );
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function unary<
     I extends Message<I> = AnyMessage,
@@ -69,7 +66,7 @@ export function createGrpcWebTransport(
       data: req.buffer,
     });
 
-    validateResponse(useBinaryFormat, statusCode, header);
+    validateResponse(statusCode, header);
 
     const { trailer, message } = await parseUaryResponseBody(
       messageStream,
@@ -112,11 +109,7 @@ export function createGrpcWebTransport(
       data: body.buffer,
     });
 
-    const { foundStatus } = validateResponse(
-      useBinaryFormat,
-      statusCode,
-      header,
-    );
+    const { foundStatus } = validateResponse(statusCode, header);
 
     const trailerTarget = new Headers();
 

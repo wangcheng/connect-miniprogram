@@ -1,9 +1,9 @@
-import { EnvelopedMessage } from '@bufbuild/connect/protocol';
+import type { EnvelopedMessage } from '@bufbuild/connect/protocol';
 import {
   endStreamFlag,
   endStreamFromJson,
 } from '@bufbuild/connect/protocol-connect';
-import { connectErrorFromReason } from '@bufbuild/connect';
+import { ConnectError } from '@bufbuild/connect';
 
 export async function* parseResponseBody<O>(
   body: AsyncGenerator<EnvelopedMessage>,
@@ -35,6 +35,6 @@ export async function* parseResponseBody<O>(
       throw 'missing EndStreamResponse';
     }
   } catch (e) {
-    throw connectErrorFromReason(e);
+    throw ConnectError.from(e);
   }
 }

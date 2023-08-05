@@ -1,4 +1,4 @@
-import { EnvelopedMessage } from '@bufbuild/connect/protocol';
+import type { EnvelopedMessage } from '@bufbuild/connect/protocol';
 import { Code, ConnectError } from '@bufbuild/connect';
 
 export async function* createEnvelopeAsyncGenerator(
