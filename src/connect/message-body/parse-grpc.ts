@@ -4,7 +4,7 @@ import {
   trailerParse,
   validateTrailer,
 } from '@bufbuild/connect/protocol-grpc-web';
-import { connectErrorFromReason } from '@bufbuild/connect';
+import { ConnectError } from '@bufbuild/connect';
 
 export async function* parseStreamResponseBody<O>(
   input: AsyncGenerator<EnvelopedMessage>,
@@ -53,7 +53,7 @@ export async function* parseStreamResponseBody<O>(
       throw 'missing trailer';
     }
   } catch (e) {
-    throw connectErrorFromReason(e);
+    throw ConnectError.from(e);
   }
 }
 
