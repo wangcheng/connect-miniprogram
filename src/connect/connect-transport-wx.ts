@@ -1,6 +1,6 @@
 import { headersToObject } from 'headers-polyfill';
-import { Message } from '@bufbuild/protobuf';
 import type {
+  Message,
   AnyMessage,
   JsonValue,
   MethodInfo,
@@ -18,16 +18,16 @@ import {
   createMethodUrl,
 } from '@bufbuild/connect/protocol';
 import {
-  requestHeader,
-  validateResponse,
-  trailerDemux,
   errorFromJson,
+  requestHeader,
+  trailerDemux,
+  validateResponse,
 } from '@bufbuild/connect/protocol-connect';
 
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 import { parseResponseBody } from './message-body/parse-connect';
 import { createRequestBody } from './message-body/create';
-import { CreateTransportOptions } from './types';
+import type { CreateTransportOptions } from './types';
 
 export function createConnectTransport(
   options: CreateTransportOptions,

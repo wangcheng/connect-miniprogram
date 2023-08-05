@@ -1,4 +1,4 @@
-import { AdditionalRequestOptions } from './types';
+import type { AdditionalRequestOptions } from './types';
 import { createEnvelopeAsyncGenerator } from './envelope';
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
 

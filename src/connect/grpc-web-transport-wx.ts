@@ -1,6 +1,6 @@
 import { headersToObject } from 'headers-polyfill';
-import { Message } from '@bufbuild/protobuf';
 import type {
+  Message,
   AnyMessage,
   MethodInfo,
   PartialMessage,
@@ -21,7 +21,7 @@ import {
   validateResponse,
 } from '@bufbuild/connect/protocol-grpc-web';
 
-import { CreateTransportOptions } from './types';
+import type { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 import {
   parseStreamResponseBody,

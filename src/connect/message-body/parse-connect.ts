@@ -1,4 +1,4 @@
-import { EnvelopedMessage } from '@bufbuild/connect/protocol';
+import type { EnvelopedMessage } from '@bufbuild/connect/protocol';
 import {
   endStreamFlag,
   endStreamFromJson,
