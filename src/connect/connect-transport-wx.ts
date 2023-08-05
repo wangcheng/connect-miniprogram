@@ -7,7 +7,7 @@ import type {
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
-import { Code, appendHeaders, connectErrorFromReason } from '@bufbuild/connect';
+import { Code, appendHeaders, ConnectError } from '@bufbuild/connect';
 import type {
   StreamResponse,
   Transport,
@@ -94,7 +94,7 @@ export function createConnectTransport(
         ...options.requestOptions,
         success: onSuccess,
         fail: (e) => {
-          reject(connectErrorFromReason(e, Code.Internal));
+          reject(ConnectError.from(e, Code.Internal));
         },
       });
     });
