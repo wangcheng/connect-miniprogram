@@ -22,7 +22,7 @@ type RequestEvent = HeadersReceivedEvent | ChunkReceivedEvent;
 
 export class WeixinRequestError extends Error {
   errno: number;
-  constructor(err: WechatMiniprogram.Err) {
+  constructor(err: WechatMiniprogram.RequestFailCallbackErr) {
     super(err.errMsg);
     this.errno = err.errno;
   }

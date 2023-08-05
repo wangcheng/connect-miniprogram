@@ -69,7 +69,7 @@ export function createGrpcWebTransport(
       data: req.buffer,
     });
 
-    validateResponse(useBinaryFormat, statusCode, header);
+    validateResponse(statusCode, header);
 
     const { trailer, message } = await parseUaryResponseBody(
       messageStream,
@@ -112,11 +112,7 @@ export function createGrpcWebTransport(
       data: body.buffer,
     });
 
-    const { foundStatus } = validateResponse(
-      useBinaryFormat,
-      statusCode,
-      header,
-    );
+    const { foundStatus } = validateResponse(statusCode, header);
 
     const trailerTarget = new Headers();
 
