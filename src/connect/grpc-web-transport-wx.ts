@@ -34,10 +34,7 @@ export function createGrpcWebTransport(
 ): Transport {
   const useBinaryFormat = options.useBinaryFormat ?? true;
 
-  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
-    options.request,
-    options.requestOptions,
-  );
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function unary<
     I extends Message<I> = AnyMessage,

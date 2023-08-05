@@ -100,10 +100,7 @@ export function createConnectTransport(
     });
   }
 
-  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(
-    options.request,
-    options.requestOptions,
-  );
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function stream<I extends Message<I>, O extends Message<O>>(
     service: ServiceType,

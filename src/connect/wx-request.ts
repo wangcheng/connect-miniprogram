@@ -1,4 +1,4 @@
-import type { AdditionalRequestOptions } from './types';
+import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
 import { createEnvelopeAsyncGenerator } from './envelope';
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
 
@@ -116,15 +116,15 @@ async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
   };
 }
 
-export function createWxRequestAsAsyncGenerator(
-  request: typeof wx.request,
-  requestOptions?: AdditionalRequestOptions,
-) {
+export function createWxRequestAsAsyncGenerator({
+  request,
+  isDevTool,
+  requestOptions,
+}: CreateTransportOptions) {
   /**
    * Weixin devtool has a bug if enableChunked is true.
    * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
    */
-  const isDevTool = wx.getSystemInfoSync().platform === 'devtools';
   const reqFn = isDevTool
     ? createWithoutChunked(request, requestOptions)
     : create(request, requestOptions);

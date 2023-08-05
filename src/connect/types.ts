@@ -23,6 +23,12 @@ export interface CreateTransportOptions {
   request: typeof wx.request;
 
   /**
+   * Weixin devtool has a bug if enableChunked is true.
+   * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
+   */
+  isDevTool?: boolean;
+
+  /**
    * Base URI for all HTTP requests.
    *
    * Requests will be made to <baseUrl>/<package>.<service>/method
