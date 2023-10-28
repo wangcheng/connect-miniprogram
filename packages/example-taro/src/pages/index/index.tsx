@@ -20,9 +20,12 @@ export default function Index() {
     const connectClient = createPromiseClient(ElizaService, connectTransport);
 
     connectClient
-      .say({
-        sentence: 'I feel happy.',
-      })
+      .say(
+        {
+          sentence: 'I feel happy.',
+        },
+        { signal: 1 as any as AbortSignal },
+      )
       .then((res) => {
         console.log('[connect.say]', res);
       });

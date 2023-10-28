@@ -6,6 +6,7 @@ import type {
   ServiceType,
 } from '@bufbuild/protobuf';
 import type {
+  ContextValues,
   StreamResponse,
   Transport,
   UnaryResponse,
@@ -21,6 +22,7 @@ import {
 } from '@connectrpc/connect/protocol-grpc-web';
 import { headersToObject } from 'headers-polyfill';
 
+import { warnUnsupportedOptions } from './compatbility';
 import { createRequestBody } from './message-body/create';
 import {
   parseStreamResponseBody,
@@ -43,17 +45,28 @@ export function createGrpcWebTransport(
   >(
     service: ServiceType,
     method: MethodInfo<I, O>,
-    _signal: AbortSignal | undefined,
+    signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     reqHeader: Record<string, string> | undefined,
     reqMessage: PartialMessage<I>,
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
+    warnUnsupportedOptions(signal, contextValues);
+
     const { serialize, parse } = createClientMethodSerializers(
       method,
       useBinaryFormat,
       options.jsonOptions,
       options.binaryOptions,
     );
+
+    timeoutMs =
+      timeoutMs === undefined
+        ? options.defaultTimeoutMs
+        : timeoutMs <= 0
+        ? undefined
+        : timeoutMs;
+
     const url = createMethodUrl(options.baseUrl, service, method);
     const finalHeader = headersToObject(
       requestHeader(useBinaryFormat, timeoutMs, reqHeader),
@@ -65,6 +78,7 @@ export function createGrpcWebTransport(
       url,
       header: finalHeader,
       data: req.buffer,
+      method: 'POST',
     });
 
     validateResponse(statusCode, header);
@@ -87,17 +101,27 @@ export function createGrpcWebTransport(
   async function stream<I extends Message<I>, O extends Message<O>>(
     service: ServiceType,
     method: MethodInfo<I, O>,
-    _signal: AbortSignal | undefined,
+    signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     input: AsyncIterable<PartialMessage<I>>,
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
+    warnUnsupportedOptions(signal, contextValues);
+
     const { serialize, parse } = createClientMethodSerializers(
       method,
       useBinaryFormat,
       options.jsonOptions,
       options.binaryOptions,
     );
+
+    timeoutMs =
+      timeoutMs === undefined
+        ? options.defaultTimeoutMs
+        : timeoutMs <= 0
+        ? undefined
+        : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = headersToObject(
@@ -113,6 +137,7 @@ export function createGrpcWebTransport(
       url,
       header: reqHeader,
       data: body.buffer,
+      method: 'POST',
     });
 
     const { foundStatus } = validateResponse(statusCode, resHeader);

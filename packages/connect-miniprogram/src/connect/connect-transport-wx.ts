@@ -7,6 +7,7 @@ import type {
   ServiceType,
 } from '@bufbuild/protobuf';
 import type {
+  ContextValues,
   StreamResponse,
   Transport,
   UnaryResponse,
@@ -22,8 +23,9 @@ import {
   trailerDemux,
   validateResponse,
 } from '@connectrpc/connect/protocol-connect';
-import { headersToObject, objectToHeaders } from 'headers-polyfill';
+import { headersToObject } from 'headers-polyfill';
 
+import { warnUnsupportedOptions } from './compatbility';
 import { createRequestBody } from './message-body/create';
 import { parseResponseBody } from './message-body/parse-connect';
 import { normalize, normalizeIterable } from './protocol/normalize';
@@ -39,17 +41,21 @@ export function createConnectTransport(
   const request = createWxRequestAsPromise(options);
 
   const useBinaryFormat = options.useBinaryFormat ?? false;
+
   async function unary<
     I extends Message<I> = AnyMessage,
     O extends Message<O> = AnyMessage,
   >(
     service: ServiceType,
     method: MethodInfo<I, O>,
-    _signal: AbortSignal | undefined,
+    signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     message: PartialMessage<I>,
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
+    warnUnsupportedOptions(signal, contextValues);
+
     const { serialize, parse } = createClientMethodSerializers(
       method,
       useBinaryFormat,
@@ -64,7 +70,6 @@ export function createConnectTransport(
         ? undefined
         : timeoutMs;
 
-    // runUnaryCall
     const url = createMethodUrl(options.baseUrl, service, method);
 
     const reqHeader = requestHeader(
@@ -82,9 +87,10 @@ export function createConnectTransport(
       url,
       header: headersToObject(reqHeader),
       data: body.buffer,
+      method: 'POST',
     });
 
-    const resHeader = objectToHeaders(response.header);
+    const resHeader = response.header;
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
       response.statusCode,
@@ -117,17 +123,27 @@ export function createConnectTransport(
   >(
     service: ServiceType,
     method: MethodInfo<I, O>,
-    _signal: AbortSignal | undefined,
+    signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     input: AsyncIterable<PartialMessage<I>>,
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
+    warnUnsupportedOptions(signal, contextValues);
+
     const { serialize, parse } = createClientMethodSerializers(
       method,
       useBinaryFormat,
       options.jsonOptions,
       options.binaryOptions,
     );
+
+    timeoutMs =
+      timeoutMs === undefined
+        ? options.defaultTimeoutMs
+        : timeoutMs <= 0
+        ? undefined
+        : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(
@@ -142,6 +158,7 @@ export function createConnectTransport(
       url,
       header: headersToObject(reqHeader),
       data: body.buffer,
+      method: 'POST',
     });
     const trailerTarget = new Headers();
     const resMessage = parseResponseBody(messageStream, trailerTarget, parse);
