@@ -130,3 +130,24 @@ export function createWxRequestAsAsyncGenerator({
     : create(request, requestOptions);
   return (options: PartialOptions) => demuxStream(reqFn(options));
 }
+
+export function createWxRequestAsPromise({
+  request,
+  requestOptions,
+}: CreateTransportOptions) {
+  return (options: PartialOptions) =>
+    new Promise<WechatMiniprogram.RequestSuccessCallbackResult>(
+      (resolve, reject) => {
+        request({
+          url: options.url,
+          header: options.header,
+          method: 'POST',
+          data: options.data,
+          responseType: 'arraybuffer',
+          ...requestOptions,
+          success: resolve,
+          fail: reject,
+        });
+      },
+    );
+}

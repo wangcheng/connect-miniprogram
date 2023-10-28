@@ -1,9 +1,9 @@
-import { ConnectError } from '@bufbuild/connect';
-import type { EnvelopedMessage } from '@bufbuild/connect/protocol';
+import { ConnectError } from '@connectrpc/connect';
+import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 import {
   endStreamFlag,
   endStreamFromJson,
-} from '@bufbuild/connect/protocol-connect';
+} from '@connectrpc/connect/protocol-connect';
 
 export async function* parseResponseBody<O>(
   body: AsyncGenerator<EnvelopedMessage>,

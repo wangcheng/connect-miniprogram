@@ -1,24 +1,24 @@
 import type {
-  StreamResponse,
-  Transport,
-  UnaryResponse,
-} from '@bufbuild/connect';
-import {
-  createClientMethodSerializers,
-  createMethodUrl,
-  encodeEnvelope,
-} from '@bufbuild/connect/protocol';
-import {
-  requestHeader,
-  validateResponse,
-} from '@bufbuild/connect/protocol-grpc-web';
-import type {
   AnyMessage,
   Message,
   MethodInfo,
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
+import type {
+  StreamResponse,
+  Transport,
+  UnaryResponse,
+} from '@connectrpc/connect';
+import {
+  createClientMethodSerializers,
+  createMethodUrl,
+  encodeEnvelope,
+} from '@connectrpc/connect/protocol';
+import {
+  requestHeader,
+  validateResponse,
+} from '@connectrpc/connect/protocol-grpc-web';
 import { headersToObject } from 'headers-polyfill';
 
 import { createRequestBody } from './message-body/create';

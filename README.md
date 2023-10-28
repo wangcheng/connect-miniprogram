@@ -22,10 +22,10 @@ import 'connect-miniprogram/polyfill';
 
 ## How to use
 
-The usage of this library is basically the same with [@bufbuild/connect-web](https://connect.build/docs/web/getting-started). You can click the link to read its doc.
+The usage of this library is basically the same with [@connectrpc/connect-web](https://connect.build/docs/web/getting-started). You can click the link to read its doc.
 
 ```js
-import { createPromiseClient } from '@bufbuild/connect';
+import { createPromiseClient } from '@connectrpc/connect';
 import {
   createConnectTransport,
   createGrpcWebTransport,

@@ -1,5 +1,5 @@
-import { encodeEnvelope } from '@bufbuild/connect/protocol';
 import { MethodKind } from '@bufbuild/protobuf';
+import { encodeEnvelope } from '@connectrpc/connect/protocol';
 
 export async function createRequestBody<I>(
   input: AsyncIterable<I>,

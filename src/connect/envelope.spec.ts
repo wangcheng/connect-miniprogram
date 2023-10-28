@@ -1,6 +1,6 @@
 import '../polyfill';
 
-import { encodeEnvelopes } from '@bufbuild/connect/protocol';
+import { encodeEnvelopes } from '@connectrpc/connect/protocol';
 import { describe, expect, it } from '@jest/globals';
 
 import { createEnvelopeAsyncGenerator } from './envelope';
