@@ -4,8 +4,8 @@
   "description": "Example",
   "appid": "touristappid",
   "setting": {
-    "urlCheck": true,
-    "es6": false,
+    "urlCheck": false,
+    "es6": true,
     "enhance": false,
     "compileHotReLoad": false,
     "postcss": false,

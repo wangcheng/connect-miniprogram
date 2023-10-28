@@ -67,7 +67,7 @@ export function createConnectTransport(
     // runUnaryCall
     const url = createMethodUrl(options.baseUrl, service, method);
 
-    const reqHeaders = requestHeader(
+    const reqHeader = requestHeader(
       method.kind,
       useBinaryFormat,
       timeoutMs,
@@ -80,24 +80,24 @@ export function createConnectTransport(
 
     const response = await request({
       url,
-      header: headersToObject(reqHeaders),
+      header: headersToObject(reqHeader),
       data: body.buffer,
     });
 
-    const resHeaders = objectToHeaders(response.header);
+    const resHeader = objectToHeaders(response.header);
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
       response.statusCode,
-      resHeaders,
+      resHeader,
     );
     if (isUnaryError) {
       throw errorFromJson(
         response.data as JsonValue,
-        appendHeaders(...trailerDemux(resHeaders)),
+        appendHeaders(...trailerDemux(resHeader)),
         unaryError,
       );
     }
-    const [demuxedHeader, demuxedTrailer] = trailerDemux(resHeaders);
+    const [demuxedHeader, demuxedTrailer] = trailerDemux(resHeader);
     const result: UnaryResponse<I, O> = {
       service,
       header: demuxedHeader as any as Headers,
@@ -130,14 +130,17 @@ export function createConnectTransport(
     );
 
     const url = createMethodUrl(options.baseUrl, service, method);
-    const reqHeader = headersToObject(
-      requestHeader(method.kind, useBinaryFormat, timeoutMs, header),
+    const reqHeader = requestHeader(
+      method.kind,
+      useBinaryFormat,
+      timeoutMs,
+      header,
     );
     const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage, serialize, method);
     const { header: resHeader, messageStream } = await requestAsAsyncIterable({
       url,
-      header: reqHeader,
+      header: headersToObject(reqHeader),
       data: body.buffer,
     });
     const trailerTarget = new Headers();
