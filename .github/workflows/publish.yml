@@ -18,7 +18,7 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: yarn
-      - run: yarn run build
-      - run: yarn publish
+      - run: yarn workspace connect-miniprogram run build
+      - run: yarn workspace connect-miniprogram publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

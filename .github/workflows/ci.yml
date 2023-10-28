@@ -14,4 +14,4 @@ jobs:
         with:
           node-version: 16
       - run: yarn
-      - run: yarn run build
+      - run: yarn workspace connect-miniprogram run build
