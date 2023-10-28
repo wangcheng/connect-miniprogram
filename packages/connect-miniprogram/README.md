@@ -1,12 +1,16 @@
 # connect-miniprogram
 
-A [Connect](https://connect.build/docs/introduction/) client for Weixin Miniprogram
+A [Connect](https://connectrpc.com) and gRPC client for Weixin Miniprogram
 
-适配小程序的 [Connect](https://connect.build/docs/introduction/) 客户端。可以在小程序中使用访问 Connect 生成的服务。支持 GRPC 和流式请求。
+适配小程序的 [Connect](https://connectrpc.com) 客户端。可以在小程序中使用 Connect 协议和 gRPC 协议的 API。
+
+> Connect is a family of libraries for building browser and gRPC-compatible HTTP APIs: you write a short [Protocol Buffer](https://developers.google.com/protocol-buffers) schema and implement your application logic, and Connect generates code to handle marshaling, routing, compression, and content type negotiation. It also generates an idiomatic, type-safe client in any supported language.
 
 ## Polyfill
 
 Connect libraries relys on some APIs that not provided in Weixin environment.
+
+Connect 依赖了一些微信小程序不支持的 API。所以需要引入 Polyfill。
 
 | API                                                                         | Polyfilled by                                                               |
 | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -16,13 +20,17 @@ Connect libraries relys on some APIs that not provided in Weixin environment.
 
 Import the polyfill at the start of your code:
 
+在小程序代码最开头插入以下内容：
+
 ```js
 import 'connect-miniprogram/polyfill';
 ```
 
-## How to use
+## How to use 使用方法
 
-The usage of this library is basically the same with [@connectrpc/connect-web](https://connect.build/docs/web/getting-started). You can click the link to read its doc.
+The usage of this library is basically the same with [@connectrpc/connect-web](https://connectrpc.com/docs/web/getting-started/). You can click the link to read its doc. You can also clone the repo and try out the `example-taro` project.
+
+使用方法跟 [@connectrpc/connect-web](https://connectrpc.com/docs/web/getting-started/) 基本相同，你可以点击链接查看文档。你也可以克隆代码，用 `example-taro` 尝试。
 
 ```js
 import { createPromiseClient } from '@connectrpc/connect';
@@ -33,14 +41,14 @@ import {
 import { ElizaService } from '@buf/bufbuild_eliza.bufbuild_connect-es/buf/connect/demo/eliza/v1/eliza_connect';
 
 const connectTransport = createConnectTransport({
-  baseUrl: 'https://demo.connect.build',
+  baseUrl: 'https://demo.connectrpc.com',
   // You need to mannualy pass the request function. You can also pass functions from 3rd party frameworks like `Taro.requst`, as long as they are compatible with Weixin's API
   request: wx.request,
 });
 
 // You can also use create a grpc-web transport. The usage is the same.
 const grpcWebTransport = createGrpcWebTransport({
-  baseUrl: 'https://demo.connect.build',
+  baseUrl: 'https://demo.connectrpc.com',
   request: wx.request,
 });
 
