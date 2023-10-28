@@ -1,10 +1,12 @@
+import { objectToHeaders } from 'headers-polyfill';
+
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
 import { createEnvelopeAsyncGenerator } from './envelope';
 import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
 
 export type PartialOptions = Pick<
   WechatMiniprogram.RequestOption,
-  'url' | 'header' | 'data'
+  'url' | 'header' | 'data' | 'method'
 >;
 
 export interface GeneralEvent<N extends string, T> {
@@ -39,7 +41,6 @@ function createWithoutChunked(
       request({
         ...options,
         ...requestOptions,
-        method: 'POST',
         responseType: 'arraybuffer',
         success: ({ header, statusCode, data, cookies }) => {
           handleValue({
@@ -73,7 +74,6 @@ function create(
       const task = request({
         ...options,
         ...requestOptions,
-        method: 'POST',
         responseType: 'arraybuffer',
         enableChunked: true,
         success: handleEnd,
@@ -136,16 +136,18 @@ export function createWxRequestAsPromise({
   requestOptions,
 }: CreateTransportOptions) {
   return (options: PartialOptions) =>
-    new Promise<WechatMiniprogram.RequestSuccessCallbackResult>(
+    new Promise<{ data: any; statusCode: number; header: Headers }>(
       (resolve, reject) => {
         request({
-          url: options.url,
-          header: options.header,
-          method: 'POST',
-          data: options.data,
-          responseType: 'arraybuffer',
+          ...options,
           ...requestOptions,
-          success: resolve,
+          responseType: 'arraybuffer',
+          success: ({ data, statusCode, header }) =>
+            resolve({
+              data,
+              statusCode,
+              header: objectToHeaders(header),
+            }),
           fail: reject,
         });
       },
