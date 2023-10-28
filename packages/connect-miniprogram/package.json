@@ -1,10 +1,19 @@
 {
   "name": "connect-miniprogram",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "dist/index.js",
   "files": [
     "dist",
     "fast-text-encoding.js"
+  ],
+  "keywords": [
+    "wechat",
+    "weixin",
+    "miniprogram",
+    "miniapp",
+    "connectrpc",
+    "grpc",
+    "protobuf"
   ],
   "repository": "https://github.com/wangcheng/connect-miniprogram.git",
   "author": "Cheng Wang <wangcheng678@gmail.com>",
