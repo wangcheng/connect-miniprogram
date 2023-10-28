@@ -1,7 +1,9 @@
-import { describe, expect, it } from '@jest/globals';
-import { encodeEnvelopes } from '@bufbuild/connect/protocol';
-import { createEnvelopeAsyncGenerator } from './envelope';
 import '../polyfill';
+
+import { encodeEnvelopes } from '@bufbuild/connect/protocol';
+import { describe, expect, it } from '@jest/globals';
+
+import { createEnvelopeAsyncGenerator } from './envelope';
 
 async function* createByteAsyncGenerator(bytes: Uint8Array, chunkSize = 2) {
   let offset = 0;

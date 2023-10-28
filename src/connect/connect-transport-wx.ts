@@ -1,18 +1,9 @@
-import { headersToObject } from 'headers-polyfill';
-import type {
-  Message,
-  AnyMessage,
-  JsonValue,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
-} from '@bufbuild/protobuf';
-import { Code, appendHeaders, ConnectError } from '@bufbuild/connect';
 import type {
   StreamResponse,
   Transport,
   UnaryResponse,
 } from '@bufbuild/connect';
+import { appendHeaders, Code, ConnectError } from '@bufbuild/connect';
 import {
   createClientMethodSerializers,
   createMethodUrl,
@@ -23,11 +14,20 @@ import {
   trailerDemux,
   validateResponse,
 } from '@bufbuild/connect/protocol-connect';
+import type {
+  AnyMessage,
+  JsonValue,
+  Message,
+  MethodInfo,
+  PartialMessage,
+  ServiceType,
+} from '@bufbuild/protobuf';
+import { headersToObject } from 'headers-polyfill';
 
-import { createWxRequestAsAsyncGenerator } from './wx-request';
-import { parseResponseBody } from './message-body/parse-connect';
 import { createRequestBody } from './message-body/create';
+import { parseResponseBody } from './message-body/parse-connect';
 import type { CreateTransportOptions } from './types';
+import { createWxRequestAsAsyncGenerator } from './wx-request';
 
 export function createConnectTransport(
   options: CreateTransportOptions,

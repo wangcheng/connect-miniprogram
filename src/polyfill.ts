@@ -1,4 +1,5 @@
 import { Headers } from 'headers-polyfill';
+
 import { FastTextDecoder, FastTextEncoder } from '../fast-text-encoding';
 
 declare global {

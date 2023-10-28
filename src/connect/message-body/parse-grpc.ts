@@ -1,10 +1,10 @@
+import { ConnectError } from '@bufbuild/connect';
 import type { EnvelopedMessage } from '@bufbuild/connect/protocol';
 import {
   trailerFlag,
   trailerParse,
   validateTrailer,
 } from '@bufbuild/connect/protocol-grpc-web';
-import { ConnectError } from '@bufbuild/connect';
 
 export async function* parseStreamResponseBody<O>(
   input: AsyncGenerator<EnvelopedMessage>,

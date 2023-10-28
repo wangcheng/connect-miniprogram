@@ -1,6 +1,6 @@
-import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
-import { createEnvelopeAsyncGenerator } from './envelope';
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
+import { createEnvelopeAsyncGenerator } from './envelope';
+import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
 
 export type PartialOptions = Pick<
   WechatMiniprogram.RequestOption,

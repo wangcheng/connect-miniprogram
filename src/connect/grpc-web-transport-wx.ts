@@ -1,11 +1,3 @@
-import { headersToObject } from 'headers-polyfill';
-import type {
-  Message,
-  AnyMessage,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
-} from '@bufbuild/protobuf';
 import type {
   StreamResponse,
   Transport,
@@ -20,14 +12,22 @@ import {
   requestHeader,
   validateResponse,
 } from '@bufbuild/connect/protocol-grpc-web';
+import type {
+  AnyMessage,
+  Message,
+  MethodInfo,
+  PartialMessage,
+  ServiceType,
+} from '@bufbuild/protobuf';
+import { headersToObject } from 'headers-polyfill';
 
-import type { CreateTransportOptions } from './types';
-import { createWxRequestAsAsyncGenerator } from './wx-request';
+import { createRequestBody } from './message-body/create';
 import {
   parseStreamResponseBody,
   parseUaryResponseBody,
 } from './message-body/parse-grpc';
-import { createRequestBody } from './message-body/create';
+import type { CreateTransportOptions } from './types';
+import { createWxRequestAsAsyncGenerator } from './wx-request';
 
 export function createGrpcWebTransport(
   options: CreateTransportOptions,
