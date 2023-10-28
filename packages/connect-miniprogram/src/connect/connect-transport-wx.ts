@@ -26,7 +26,7 @@ import { headersToObject, objectToHeaders } from 'headers-polyfill';
 
 import { createRequestBody } from './message-body/create';
 import { parseResponseBody } from './message-body/parse-connect';
-import { normalize, normalizeIterable } from './protocal/normalize';
+import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
 import {
   createWxRequestAsAsyncGenerator,

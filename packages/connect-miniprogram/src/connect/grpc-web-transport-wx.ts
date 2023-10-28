@@ -26,7 +26,7 @@ import {
   parseStreamResponseBody,
   parseUaryResponseBody,
 } from './message-body/parse-grpc';
-import { normalize, normalizeIterable } from './protocal/normalize';
+import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 
