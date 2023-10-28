@@ -62,6 +62,6 @@ async function serverStream() {
 
 ## Limitations
 
-- Doesn't support interceptor (yet). I will add this support in the future.
-- Doesn't support `AbortSignal` because Weixin doesn't have `AbortSignal` API.
+- Doesn't support interceptor and `contextValues` option.
+- Doesn't support `signal` option because Weixin doesn't have `AbortSignal` API.
 - Doesn't support stream request body because either `fetch` or Weixin dosen't support sending stream request.
