@@ -141,13 +141,14 @@ export function createConnectTransport(
       data: body.buffer,
     });
     const trailerTarget = new Headers();
+    const resMessage = parseResponseBody(messageStream, trailerTarget, parse);
     return {
       service,
       method,
       stream: true,
       header: resHeader,
       trailer: trailerTarget,
-      message: parseResponseBody(messageStream, trailerTarget, parse),
+      message: resMessage,
     };
   }
 

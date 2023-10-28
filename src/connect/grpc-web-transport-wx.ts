@@ -26,6 +26,7 @@ import {
   parseStreamResponseBody,
   parseUaryResponseBody,
 } from './message-body/parse-grpc';
+import { normalize, normalizeIterable } from './protocal/normalize';
 import type { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
 
@@ -47,7 +48,7 @@ export function createGrpcWebTransport(
     reqHeader: Record<string, string> | undefined,
     reqMessage: PartialMessage<I>,
   ): Promise<UnaryResponse<I, O>> {
-    const { normalize, serialize, parse } = createClientMethodSerializers(
+    const { serialize, parse } = createClientMethodSerializers(
       method,
       useBinaryFormat,
       options.jsonOptions,
@@ -58,7 +59,7 @@ export function createGrpcWebTransport(
       requestHeader(useBinaryFormat, timeoutMs, reqHeader),
     );
 
-    const req = encodeEnvelope(0, serialize(normalize(reqMessage)));
+    const req = encodeEnvelope(0, serialize(normalize(method.I, reqMessage)));
 
     const { header, messageStream, statusCode } = await requestAsAsyncIterable({
       url,
@@ -88,8 +89,8 @@ export function createGrpcWebTransport(
     method: MethodInfo<I, O>,
     _signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    reqHeader: HeadersInit | undefined,
-    reqMessage: AsyncIterable<I>,
+    header: HeadersInit | undefined,
+    input: AsyncIterable<PartialMessage<I>>,
   ): Promise<StreamResponse<I, O>> {
     const { serialize, parse } = createClientMethodSerializers(
       method,
@@ -99,21 +100,26 @@ export function createGrpcWebTransport(
     );
 
     const url = createMethodUrl(options.baseUrl, service, method);
-    const finalHeader = headersToObject(
-      requestHeader(useBinaryFormat, timeoutMs, reqHeader),
+    const reqHeader = headersToObject(
+      requestHeader(useBinaryFormat, timeoutMs, header),
     );
+    const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage, serialize, method);
-    const { header, messageStream, statusCode } = await requestAsAsyncIterable({
+    const {
+      header: resHeader,
+      messageStream,
+      statusCode,
+    } = await requestAsAsyncIterable({
       url,
-      header: finalHeader,
+      header: reqHeader,
       data: body.buffer,
     });
 
-    const { foundStatus } = validateResponse(statusCode, header);
+    const { foundStatus } = validateResponse(statusCode, resHeader);
 
     const trailerTarget = new Headers();
 
-    const message = await parseStreamResponseBody(
+    const resMessage = await parseStreamResponseBody(
       messageStream,
       foundStatus,
       trailerTarget,
@@ -124,9 +130,9 @@ export function createGrpcWebTransport(
       service,
       method,
       stream: true,
-      header,
+      header: resHeader,
       trailer: trailerTarget,
-      message,
+      message: resMessage,
     };
   }
 
