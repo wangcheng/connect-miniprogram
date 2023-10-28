@@ -8,17 +8,26 @@ import {
 import { ElizaService } from '../../../pb/eliza_connect';
 
 const isDevTool = getSystemInfoSync().platform === 'devtools';
+const baseUrl = 'https://demo.connectrpc.com';
+
+const connectTransport = createConnectTransport({
+  baseUrl,
+  request,
+  isDevTool,
+});
+
+const connectClient = createPromiseClient(ElizaService, connectTransport);
+
+const grpcTransport = createGrpcWebTransport({
+  baseUrl,
+  request,
+  isDevTool,
+});
+
+const grpcClient = createPromiseClient(ElizaService, grpcTransport);
 
 export default function Index() {
   useLoad(async () => {
-    const connectTransport = createConnectTransport({
-      baseUrl: 'https://demo.connectrpc.com',
-      request: request,
-      isDevTool,
-    });
-
-    const connectClient = createPromiseClient(ElizaService, connectTransport);
-
     connectClient
       .say({
         sentence: 'I feel happy.',
@@ -30,14 +39,6 @@ export default function Index() {
     for await (const res of connectClient.introduce({ name: 'Joseph' })) {
       console.log('[connect.introduce]', res);
     }
-
-    const grpcTransport = createGrpcWebTransport({
-      baseUrl: 'https://demo.connectrpc.com',
-      request: request,
-      isDevTool,
-    });
-
-    const grpcClient = createPromiseClient(ElizaService, grpcTransport);
 
     grpcClient
       .say({
