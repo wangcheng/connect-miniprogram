@@ -47,8 +47,8 @@ export function createGrpcWebTransport(
     method: MethodInfo<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    reqHeader: Record<string, string> | undefined,
-    reqMessage: PartialMessage<I>,
+    header: Record<string, string> | undefined,
+    message: PartialMessage<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     warnUnsupportedOptions(signal, contextValues);
@@ -68,33 +68,31 @@ export function createGrpcWebTransport(
         : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
-    const finalHeader = headersToObject(
-      requestHeader(useBinaryFormat, timeoutMs, reqHeader),
-    );
+    const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header);
 
-    const req = encodeEnvelope(0, serialize(normalize(method.I, reqMessage)));
+    reqHeader.delete('User-Agent');
 
-    const { header, messageStream, statusCode } = await requestAsAsyncIterable({
+    const req = encodeEnvelope(0, serialize(normalize(method.I, message)));
+
+    const response = await requestAsAsyncIterable({
       url,
-      header: finalHeader,
+      header: headersToObject(reqHeader),
       data: req.buffer,
       method: 'POST',
     });
 
-    validateResponse(statusCode, header);
+    validateResponse(response.statusCode, response.header);
 
-    const { trailer, message } = await parseUaryResponseBody(
-      messageStream,
-      parse,
-    );
+    const { trailer: resTrailer, message: resMessage } =
+      await parseUaryResponseBody(response.messageStream, parse);
 
     return {
       service,
       method,
       stream: false,
-      header,
-      trailer,
-      message,
+      header: response.header,
+      trailer: resTrailer,
+      message: resMessage,
     };
   }
 
@@ -124,28 +122,28 @@ export function createGrpcWebTransport(
         : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
-    const reqHeader = headersToObject(
-      requestHeader(useBinaryFormat, timeoutMs, header),
-    );
+    const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header);
+
+    reqHeader.delete('User-Agent');
+
     const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage, serialize, method);
-    const {
-      header: resHeader,
-      messageStream,
-      statusCode,
-    } = await requestAsAsyncIterable({
+    const response = await requestAsAsyncIterable({
       url,
-      header: reqHeader,
+      header: headersToObject(reqHeader),
       data: body.buffer,
       method: 'POST',
     });
 
-    const { foundStatus } = validateResponse(statusCode, resHeader);
+    const { foundStatus } = validateResponse(
+      response.statusCode,
+      response.header,
+    );
 
     const trailerTarget = new Headers();
 
     const resMessage = await parseStreamResponseBody(
-      messageStream,
+      response.messageStream,
       foundStatus,
       trailerTarget,
       parse,
@@ -155,7 +153,7 @@ export function createGrpcWebTransport(
       service,
       method,
       stream: true,
-      header: resHeader,
+      header: response.header,
       trailer: trailerTarget,
       message: resMessage,
     };

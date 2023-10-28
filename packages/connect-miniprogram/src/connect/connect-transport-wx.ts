@@ -79,6 +79,8 @@ export function createConnectTransport(
       header,
     );
 
+    reqHeader.delete('User-Agent');
+
     const reqMessage = normalize(method.I, message);
 
     const body = serialize(reqMessage);
@@ -90,20 +92,19 @@ export function createConnectTransport(
       method: 'POST',
     });
 
-    const resHeader = response.header;
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
       response.statusCode,
-      resHeader,
+      response.header,
     );
     if (isUnaryError) {
       throw errorFromJson(
         response.data as JsonValue,
-        appendHeaders(...trailerDemux(resHeader)),
+        appendHeaders(...trailerDemux(response.header)),
         unaryError,
       );
     }
-    const [demuxedHeader, demuxedTrailer] = trailerDemux(resHeader);
+    const [demuxedHeader, demuxedTrailer] = trailerDemux(response.header);
     const result: UnaryResponse<I, O> = {
       service,
       header: demuxedHeader as any as Headers,
@@ -152,21 +153,28 @@ export function createConnectTransport(
       timeoutMs,
       header,
     );
+
+    reqHeader.delete('User-Agent');
+
     const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage, serialize, method);
-    const { header: resHeader, messageStream } = await requestAsAsyncIterable({
+    const response = await requestAsAsyncIterable({
       url,
       header: headersToObject(reqHeader),
       data: body.buffer,
       method: 'POST',
     });
     const trailerTarget = new Headers();
-    const resMessage = parseResponseBody(messageStream, trailerTarget, parse);
+    const resMessage = parseResponseBody(
+      response.messageStream,
+      trailerTarget,
+      parse,
+    );
     return {
       service,
       method,
       stream: true,
-      header: resHeader,
+      header: response.header,
       trailer: trailerTarget,
       message: resMessage,
     };
