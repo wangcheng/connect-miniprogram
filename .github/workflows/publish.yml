@@ -22,6 +22,7 @@ jobs:
       - run: yarn set version stable
       - run: yarn
       - run: yarn workspace connect-miniprogram run build
+      - run: yarn workspace example-mina test-build-result
       - run: yarn workspace connect-miniprogram publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
