@@ -1675,6 +1675,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@buf/connectrpc_eliza.bufbuild_es@npm:1.4.1-20230913231627-233fca715f49.1":
+  version: 1.4.1-20230913231627-233fca715f49.1
+  resolution: "@buf/connectrpc_eliza.bufbuild_es@npm:1.4.1-20230913231627-233fca715f49.1"
+  peerDependencies:
+    "@bufbuild/protobuf": ^1.4.1
+  checksum: f2dc71b341ec118c425e37b101cd2c81895fdbf39ccff7dc2b7489620c26724b3db7ac3d115b9274ddbe6abefbbcafe556b53dca84a627761b6818f2a144b035
+  languageName: node
+  linkType: hard
+
+"@buf/connectrpc_eliza.connectrpc_es@npm:^1.1.3-20230913231627-233fca715f49.1":
+  version: 1.1.3-20230913231627-233fca715f49.1
+  resolution: "@buf/connectrpc_eliza.connectrpc_es@npm:1.1.3-20230913231627-233fca715f49.1"
+  dependencies:
+    "@buf/connectrpc_eliza.bufbuild_es": "npm:1.4.1-20230913231627-233fca715f49.1"
+  peerDependencies:
+    "@connectrpc/connect": ^1.1.3
+  checksum: 6fc71baa1438b30e568a5c13a49847a0f5264fb1582a6bab580e86729a01e5ae6d15e670b92d5f51cb25e7cfc8726ef07b48b536dfe018e4b5e527019d266bd7
+  languageName: node
+  linkType: hard
+
 "@bufbuild/protobuf@npm:^1.4.1":
   version: 1.4.1
   resolution: "@bufbuild/protobuf@npm:1.4.1"
@@ -7607,6 +7627,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.23.2"
     "@babel/runtime": "npm:^7.23.2"
+    "@buf/connectrpc_eliza.connectrpc_es": "npm:^1.1.3-20230913231627-233fca715f49.1"
     "@bufbuild/protobuf": "npm:^1.4.1"
     "@connectrpc/connect": "npm:^1.1.3"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.5.11"

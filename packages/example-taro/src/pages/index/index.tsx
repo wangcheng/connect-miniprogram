@@ -5,7 +5,7 @@ import {
   createConnectTransport,
   createGrpcWebTransport,
 } from 'connect-miniprogram/src';
-import { ElizaService } from '../../../pb/eliza_connect';
+import { ElizaService } from '@buf/connectrpc_eliza.connectrpc_es/connectrpc/eliza/v1/eliza_connect';
 
 const isDevTool = getSystemInfoSync().platform === 'devtools';
 const baseUrl = 'https://demo.connectrpc.com';
