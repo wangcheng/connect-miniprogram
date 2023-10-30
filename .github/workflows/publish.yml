@@ -12,11 +12,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@vš
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: 'FrontEnd/yarn.lock'
           registry-url: https://registry.npmjs.org/
+      - run: yarn set version stable
       - run: yarn
       - run: yarn workspace connect-miniprogram run build
       - run: yarn workspace connect-miniprogram publish
