@@ -7856,6 +7856,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-mina@workspace:packages/example-mina"
   dependencies:
+    "@buf/connectrpc_eliza.connectrpc_es": "npm:^1.1.3-20230913231627-233fca715f49.1"
     "@bufbuild/protobuf": "npm:^1.4.1"
     "@connectrpc/connect": "npm:^1.1.3"
     connect-miniprogram: "workspace:packages/connect-miniprogram"
