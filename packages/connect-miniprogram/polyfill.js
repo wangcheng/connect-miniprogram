@@ -1,12 +1,8 @@
 import { Headers } from 'headers-polyfill';
 
-import { FastTextDecoder, FastTextEncoder } from '../fast-text-encoding';
+import { FastTextDecoder, FastTextEncoder } from './fast-text-encoding';
 
-declare global {
-  const GameGlobal: unknown;
-}
-
-function polyfill(target: any = global || window) {
+function polyfill(target = global || window) {
   if (typeof target === 'object') {
     target['Headers'] = Headers;
     target['TextDecoder'] = FastTextDecoder;
@@ -30,3 +26,5 @@ try {
 } catch (e) {
   /* empty */
 }
+
+export { FastTextDecoder, FastTextEncoder, Headers as HeadersPolyfill };

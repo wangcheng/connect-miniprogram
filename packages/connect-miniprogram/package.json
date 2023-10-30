@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "files": [
     "dist",
+    "polyfill.js",
     "fast-text-encoding.js"
   ],
   "keywords": [
