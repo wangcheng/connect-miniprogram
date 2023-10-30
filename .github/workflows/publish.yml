@@ -12,17 +12,16 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@vš
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'yarn'
-          cache-dependency-path: 'FrontEnd/yarn.lock'
+          cache-dependency-path: 'yarn.lock'
           registry-url: https://registry.npmjs.org/
       - run: yarn set version stable
       - run: yarn
       - run: yarn workspace connect-miniprogram run build
       - run: yarn workspace example-mina test-build-result
-      - run: yarn workspace connect-miniprogram publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - run: yarn config set npmAuthToken ${{secrets.NPM_TOKEN}}
+      - run: yarn workspace connect-miniprogram npm publish
