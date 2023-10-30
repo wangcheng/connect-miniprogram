@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
 import { useLaunch } from '@tarojs/taro';
-import 'connect-miniprogram/src/polyfill';
 
 function App({ children }: PropsWithChildren) {
   useLaunch(() => {

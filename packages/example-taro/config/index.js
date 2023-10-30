@@ -40,6 +40,15 @@ const config = {
         },
       },
     },
+    webpackChain: (chain, webpack) => {
+      chain.plugin('shimming').use(webpack.ProvidePlugin, [
+        {
+          Headers: ['connect-miniprogram/shims.js', 'HeadersPolyfill'],
+          TextDecoder: ['connect-miniprogram/shims.js', 'FastTextDecoder'],
+          TextEncoder: ['connect-miniprogram/shims.js', 'FastTextEncoder'],
+        },
+      ]);
+    },
   },
   h5: {
     publicPath: '/',
