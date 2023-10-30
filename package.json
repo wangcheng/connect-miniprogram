@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "packages/connect-miniprogram",
-    "packages/example-taro"
+    "packages/example-taro",
+    "packages/example-mina"
   ],
   "prettier": {
     "arrowParens": "always",

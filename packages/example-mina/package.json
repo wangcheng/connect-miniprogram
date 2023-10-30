@@ -1,0 +1,17 @@
+{
+  "name": "example-mina",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/connect-client.js --bundle --outfile=miniprogram/generated_modules/connect-client.js --format=cjs --target=es2015 --inject:src/polyfill.js"
+  },
+  "dependencies": {
+    "@buf/connectrpc_eliza.connectrpc_es": "^1.1.3-20230913231627-233fca715f49.1",
+    "@bufbuild/protobuf": "^1.4.1",
+    "@connectrpc/connect": "^1.1.3",
+    "connect-miniprogram": "workspace:packages/connect-miniprogram"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.5"
+  }
+}
