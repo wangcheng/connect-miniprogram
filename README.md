@@ -18,6 +18,44 @@ Connect 依赖了一些微信小程序不支持的 API。所以需要引入 Poly
 | [TextEncoder](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder) | [samthor/fast-text-encoding](https://github.com/samthor/fast-text-encoding) |
 | [TextDecoder](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) | [samthor/fast-text-encoding](https://github.com/samthor/fast-text-encoding) |
 
+### Method 1 Use "shimming" (recommended)
+
+Use the bundlers "shimming" feature to replace all usage of `Headers` `TextEncoder` `TextDecoder` with the polyfill version. This is the recommended method because it doesn't pollute the global scope.
+
+使用打包工具的 “Shimming” 功能替换代码中所有的 `Headers` `TextEncoder` `TextDecoder`。比较推荐这种方法，因为这样不会污染 global 对象。
+
+[Webpack](https://webpack.js.org/guides/shimming/#shimming-globals):
+
+```js
+module.exports = {
+  plugins: [
+    new webpack.ProvidePlugin({
+      Headers: ['connect-miniprogram/shims.js', 'HeadersPolyfill'],
+      TextDecoder: ['connect-miniprogram/shims.js', 'FastTextDecoder'],
+      TextEncoder: ['connect-miniprogram/shims.js', 'FastTextEncoder'],
+    }),
+  ],
+};
+```
+
+[Taro](https://docs.taro.zone/docs/config-detail/#miniwebpackchain):
+
+```js
+{
+  webpackChain: (chain, webpack) => {
+    chain.plugin('shimming').use(webpack.ProvidePlugin, [
+      {
+        Headers: ['connect-miniprogram/shims.js', 'HeadersPolyfill'],
+        TextDecoder: ['connect-miniprogram/shims.js', 'FastTextDecoder'],
+        TextEncoder: ['connect-miniprogram/shims.js', 'FastTextEncoder'],
+      },
+    ]);
+  };
+}
+```
+
+### Method 1 Use "polyfill"
+
 Import the polyfill at the start of your code:
 
 在小程序代码最开头插入以下内容：
