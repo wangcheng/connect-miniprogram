@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "esbuild src/connect-client.js --bundle --outfile=miniprogram/generated_modules/connect-client.js --format=cjs --target=es2015 --inject:src/polyfill.js",
+    "build": "esbuild src/connect-client.js --bundle --outfile=miniprogram/generated_modules/connect-client.js --format=cjs --target=es2015 --inject:src/shims.js",
     "test-build-result": "esbuild src/test-build-result.js --bundle --outfile=dist/test-build-result.js --format=cjs --target=es2015"
   },
   "dependencies": {
