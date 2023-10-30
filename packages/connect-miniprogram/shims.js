@@ -1,3 +1,5 @@
+export { Headers as HeadersPolyfill } from 'headers-polyfill';
+
 /**
  * A custom build of fast-text-encoding: https://github.com/samthor/fast-text-encoding
  */
