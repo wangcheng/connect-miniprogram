@@ -7,12 +7,12 @@
     "test-build-result": "esbuild src/test-build-result.js --bundle --outfile=dist/test-build-result.js --format=cjs --target=es2015"
   },
   "dependencies": {
-    "@buf/connectrpc_eliza.connectrpc_es": "^1.1.3-20230913231627-233fca715f49.1",
-    "@bufbuild/protobuf": "^1.4.1",
-    "@connectrpc/connect": "^1.1.3",
+    "@buf/connectrpc_eliza.connectrpc_es": "^1.4.0-20230913231627-233fca715f49.2",
+    "@bufbuild/protobuf": "^1.8.0",
+    "@connectrpc/connect": "^1.4.0",
     "connect-miniprogram": "workspace:packages/connect-miniprogram"
   },
   "devDependencies": {
-    "esbuild": "^0.19.5"
+    "esbuild": "^0.20.2"
   }
 }

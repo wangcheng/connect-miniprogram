@@ -1,6 +1,13 @@
+/**
+ * @see https://github.com/connectrpc/connect-es/blob/main/packages/connect/src/protocol/envelope.ts
+ */
+
 import { Code, ConnectError } from '@connectrpc/connect';
 import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 
+/**
+ * basically the same as `createEnvelopeReadableStream` in the upstream code
+ */
 export async function* createEnvelopeAsyncGenerator(
   stream: AsyncGenerator<Uint8Array>,
 ): AsyncGenerator<EnvelopedMessage> {
