@@ -20,7 +20,6 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
           registry-url: https://registry.npmjs.org/
-      - run: yarn set version stable
       - run: yarn
       - run: yarn workspace connect-miniprogram run build
       - run: yarn workspace example-mina test-build-result
