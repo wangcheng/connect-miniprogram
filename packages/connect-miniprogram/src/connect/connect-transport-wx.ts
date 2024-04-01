@@ -1,3 +1,7 @@
+/**
+ * @see https://github.com/connectrpc/connect-es/blob/main/packages/connect-web/src/connect-transport.ts
+ */
+
 import type {
   AnyMessage,
   JsonValue,
@@ -6,6 +10,7 @@ import type {
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
+import { MethodKind } from '@bufbuild/protobuf';
 import type {
   ContextValues,
   StreamResponse,
@@ -13,21 +18,26 @@ import type {
   UnaryResponse,
 } from '@connectrpc/connect';
 import { appendHeaders } from '@connectrpc/connect';
+import { ConnectError } from '@connectrpc/connect';
+import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 import {
   createClientMethodSerializers,
   createMethodUrl,
 } from '@connectrpc/connect/protocol';
+import { encodeEnvelope } from '@connectrpc/connect/protocol';
 import {
   errorFromJson,
   requestHeader,
   trailerDemux,
   validateResponse,
 } from '@connectrpc/connect/protocol-connect';
+import {
+  endStreamFlag,
+  endStreamFromJson,
+} from '@connectrpc/connect/protocol-connect';
 import { headersToObject } from 'headers-polyfill';
 
 import { warnUnsupportedOptions } from './compatbility';
-import { createRequestBody } from './message-body/create';
-import { parseResponseBody } from './message-body/parse-connect';
 import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
 import {
@@ -77,6 +87,7 @@ export function createConnectTransport(
       useBinaryFormat,
       timeoutMs,
       header,
+      false,
     );
 
     reqHeader.delete('User-Agent');
@@ -139,6 +150,57 @@ export function createConnectTransport(
       options.binaryOptions,
     );
 
+    async function* parseResponseBody(
+      body: AsyncGenerator<EnvelopedMessage>,
+      trailerTarget: Headers,
+      header: Headers,
+    ) {
+      try {
+        let endStreamReceived = false;
+        for (;;) {
+          const result = await body.next();
+          if (result.done) {
+            break;
+          }
+          const { flags, data } = result.value;
+          if ((flags & endStreamFlag) === endStreamFlag) {
+            endStreamReceived = true;
+            const endStream = endStreamFromJson(data);
+            if (endStream.error) {
+              const error = endStream.error;
+              header.forEach((value, key) => {
+                error.metadata.append(key, value);
+              });
+              throw error;
+            }
+            endStream.metadata.forEach((value, key) =>
+              trailerTarget.set(key, value),
+            );
+            continue;
+          }
+          yield parse(data);
+        }
+        if (!endStreamReceived) {
+          throw 'missing EndStreamResponse';
+        }
+      } catch (e) {
+        throw ConnectError.from(e);
+      }
+    }
+
+    async function createRequestBody(
+      input: AsyncIterable<I>,
+    ): Promise<Uint8Array> {
+      if (method.kind != MethodKind.ServerStreaming) {
+        throw 'Weixin does not support streaming request bodies';
+      }
+      const r = await input[Symbol.asyncIterator]().next();
+      if (r.done == true) {
+        throw 'missing request message';
+      }
+      return encodeEnvelope(0, serialize(r.value));
+    }
+
     timeoutMs =
       timeoutMs === undefined
         ? options.defaultTimeoutMs
@@ -152,12 +214,13 @@ export function createConnectTransport(
       useBinaryFormat,
       timeoutMs,
       header,
+      false,
     );
 
     reqHeader.delete('User-Agent');
 
     const reqMessage = normalizeIterable(method.I, input);
-    const body = await createRequestBody(reqMessage, serialize, method);
+    const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
       url,
       header: headersToObject(reqHeader),
@@ -168,7 +231,7 @@ export function createConnectTransport(
     const resMessage = parseResponseBody(
       response.messageStream,
       trailerTarget,
-      parse,
+      response.header,
     );
     return {
       service,
