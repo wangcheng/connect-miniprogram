@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - run: corepack enable
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
-      - run: yarn set version stable
       - run: yarn
       - run: yarn workspace connect-miniprogram run build
       - run: yarn workspace example-mina test-build-result
