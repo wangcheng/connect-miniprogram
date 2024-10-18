@@ -1,9 +1,11 @@
 {
   "name": "connect-miniprogram",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "main": "dist/index.js",
   "files": [
     "dist",
+    "LICENSE",
+    "README.md",
     "fast-text-encoding.js",
     "polyfill.js",
     "shims.js"
