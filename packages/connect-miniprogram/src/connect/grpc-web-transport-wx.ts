@@ -16,23 +16,21 @@ import type {
   Transport,
   UnaryResponse,
 } from '@connectrpc/connect';
-import { ConnectError } from '@connectrpc/connect';
+import { Code, ConnectError } from '@connectrpc/connect';
 import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 import {
+  compressedFlag,
   createClientMethodSerializers,
   createMethodUrl,
   encodeEnvelope,
 } from '@connectrpc/connect/protocol';
 import {
   requestHeader,
-  validateResponse,
-} from '@connectrpc/connect/protocol-grpc-web';
-import {
   trailerFlag,
   trailerParse,
+  validateResponse,
   validateTrailer,
 } from '@connectrpc/connect/protocol-grpc-web';
-import { headersToObject } from 'headers-polyfill';
 
 import { warnUnsupportedOptions } from './compatbility';
 import { normalize, normalizeIterable } from './protocol/normalize';
@@ -71,8 +69,8 @@ export function createGrpcWebTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
@@ -83,7 +81,7 @@ export function createGrpcWebTransport(
 
     const response = await requestAsAsyncIterable({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: req.buffer,
       method: 'POST',
     });
@@ -94,6 +92,12 @@ export function createGrpcWebTransport(
     let resMessage: O | undefined;
     for await (const chunk of response.messageStream) {
       const { flags, data } = chunk;
+      if ((flags & compressedFlag) === compressedFlag) {
+        throw new ConnectError(
+          `protocol error: received unsupported compressed output`,
+          Code.Internal,
+        );
+      }
       if (flags === trailerFlag) {
         if (resTrailer !== undefined) {
           throw 'extra trailer';
@@ -118,12 +122,12 @@ export function createGrpcWebTransport(
     }
 
     return {
+      stream: false,
       service,
       method,
-      stream: false,
       header: response.header,
-      trailer: resTrailer,
       message: resMessage,
+      trailer: resTrailer,
     };
   }
 
@@ -151,48 +155,44 @@ export function createGrpcWebTransport(
       trailerTarget: Headers,
       header: Headers,
     ) {
-      try {
-        if (foundStatus) {
-          // A grpc-status: 0 response header was present. This is a "trailers-only"
-          // response (a response without a body and no trailers).
-          //
-          // The spec seems to disallow a trailers-only response for status 0 - we are
-          // lenient and only verify that the body is empty.
-          //
-          // > [...] Trailers-Only is permitted for calls that produce an immediate error.
-          // See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
-          if (!(await input.next()).done) {
-            throw 'extra data for trailers-only';
-          }
-          return;
+      if (foundStatus) {
+        // A grpc-status: 0 response header was present. This is a "trailers-only"
+        // response (a response without a body and no trailers).
+        //
+        // The spec seems to disallow a trailers-only response for status 0 - we are
+        // lenient and only verify that the body is empty.
+        //
+        // > [...] Trailers-Only is permitted for calls that produce an immediate error.
+        // See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+        if (!(await input.next()).done) {
+          throw 'extra data for trailers-only';
         }
-        let trailerReceived = false;
-        for await (const chunk of input) {
-          const { flags, data } = chunk;
+        return;
+      }
+      let trailerReceived = false;
+      for await (const chunk of input) {
+        const { flags, data } = chunk;
 
-          if ((flags & trailerFlag) === trailerFlag) {
-            if (trailerReceived) {
-              throw 'extra trailer';
-            }
-            trailerReceived = true;
-            const trailer = trailerParse(data);
-
-            validateTrailer(trailer, header);
-            trailer.forEach((value, key) => trailerTarget.set(key, value));
-
-            continue;
-          }
+        if ((flags & trailerFlag) === trailerFlag) {
           if (trailerReceived) {
-            throw 'extra message';
+            throw 'extra trailer';
           }
-          yield parse(data);
+          trailerReceived = true;
+          const trailer = trailerParse(data);
+
+          validateTrailer(trailer, header);
+          trailer.forEach((value, key) => trailerTarget.set(key, value));
+
           continue;
         }
-        if (!trailerReceived) {
-          throw 'missing trailer';
+        if (trailerReceived) {
+          throw 'extra message';
         }
-      } catch (e) {
-        throw ConnectError.from(e);
+        yield parse(data);
+        continue;
+      }
+      if (!trailerReceived) {
+        throw 'missing trailer';
       }
     }
 
@@ -213,8 +213,8 @@ export function createGrpcWebTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
@@ -225,7 +225,7 @@ export function createGrpcWebTransport(
     const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: body.buffer,
       method: 'POST',
     });

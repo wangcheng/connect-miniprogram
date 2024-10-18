@@ -1,4 +1,4 @@
-import { objectToHeaders } from 'headers-polyfill';
+import { headersToObject } from 'headers-polyfill';
 
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
 import { createEnvelopeAsyncGenerator } from './envelope';
@@ -6,8 +6,10 @@ import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
 
 export type PartialOptions = Pick<
   WechatMiniprogram.RequestOption,
-  'url' | 'header' | 'data' | 'method'
->;
+  'url' | 'data' | 'method'
+> & {
+  header?: Headers;
+};
 
 export interface GeneralEvent<N extends string, T> {
   name: N;
@@ -30,6 +32,15 @@ export class WeixinRequestError extends Error {
   }
 }
 
+// convert native Headers object to plain object which is supported by wx.request
+function convertOptionsWithHeader(options: PartialOptions) {
+  const { header, ...rest } = options;
+  return {
+    ...rest,
+    ...(header ? { header: headersToObject(header) } : {}),
+  };
+}
+
 function createWithoutChunked(
   request: typeof wx.request,
   requestOptions?: AdditionalRequestOptions,
@@ -39,7 +50,7 @@ function createWithoutChunked(
       HeadersReceivedEvent | ChunkReceivedEvent
     >(({ handleValue, handleEnd, handleError }) => {
       request({
-        ...options,
+        ...convertOptionsWithHeader(options),
         ...requestOptions,
         responseType: 'arraybuffer',
         success: ({ header, statusCode, data, cookies }) => {
@@ -72,7 +83,7 @@ function create(
       HeadersReceivedEvent | ChunkReceivedEvent
     >(({ handleValue, handleEnd, handleError }) => {
       const task = request({
-        ...options,
+        ...convertOptionsWithHeader(options),
         ...requestOptions,
         responseType: 'arraybuffer',
         enableChunked: true,
@@ -139,14 +150,14 @@ export function createWxRequestAsPromise({
     new Promise<{ data: any; statusCode: number; header: Headers }>(
       (resolve, reject) => {
         request({
-          ...options,
+          ...convertOptionsWithHeader(options),
           ...requestOptions,
           responseType: 'arraybuffer',
           success: ({ data, statusCode, header }) =>
             resolve({
               data,
               statusCode,
-              header: objectToHeaders(header),
+              header: new Headers(header),
             }),
           fail: reject,
         });
