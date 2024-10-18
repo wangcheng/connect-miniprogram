@@ -107,6 +107,7 @@ export function createConnectTransport(
 
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
+      useBinaryFormat,
       response.statusCode,
       response.header,
     );

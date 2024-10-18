@@ -230,10 +230,14 @@ export function createGrpcWebTransport(
       method: 'POST',
     });
 
-    const { foundStatus } = validateResponse(
+    const { foundStatus, headerError } = validateResponse(
       response.statusCode,
       response.header,
     );
+
+    if (headerError != undefined) {
+      throw headerError;
+    }
 
     const trailerTarget = new Headers();
 
