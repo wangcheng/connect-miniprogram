@@ -33,7 +33,6 @@ import {
   trailerDemux,
   validateResponse,
 } from '@connectrpc/connect/protocol-connect';
-import { headersToObject } from 'headers-polyfill';
 
 import { warnUnsupportedOptions } from './compatbility';
 import { normalize, normalizeIterable } from './protocol/normalize';
@@ -98,7 +97,7 @@ export function createConnectTransport(
 
     const response = await request({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: body.buffer,
       method: 'POST',
     });
@@ -230,7 +229,7 @@ export function createConnectTransport(
     const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: body.buffer,
       method: 'POST',
     });

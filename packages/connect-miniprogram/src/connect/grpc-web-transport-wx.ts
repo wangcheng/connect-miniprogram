@@ -31,7 +31,6 @@ import {
   validateResponse,
   validateTrailer,
 } from '@connectrpc/connect/protocol-grpc-web';
-import { headersToObject } from 'headers-polyfill';
 
 import { warnUnsupportedOptions } from './compatbility';
 import { normalize, normalizeIterable } from './protocol/normalize';
@@ -82,7 +81,7 @@ export function createGrpcWebTransport(
 
     const response = await requestAsAsyncIterable({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: req.buffer,
       method: 'POST',
     });
@@ -226,7 +225,7 @@ export function createGrpcWebTransport(
     const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
       url,
-      header: headersToObject(reqHeader),
+      header: reqHeader,
       data: body.buffer,
       method: 'POST',
     });
