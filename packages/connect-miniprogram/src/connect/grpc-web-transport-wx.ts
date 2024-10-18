@@ -25,11 +25,9 @@ import {
 } from '@connectrpc/connect/protocol';
 import {
   requestHeader,
-  validateResponse,
-} from '@connectrpc/connect/protocol-grpc-web';
-import {
   trailerFlag,
   trailerParse,
+  validateResponse,
   validateTrailer,
 } from '@connectrpc/connect/protocol-grpc-web';
 import { headersToObject } from 'headers-polyfill';
@@ -71,8 +69,8 @@ export function createGrpcWebTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
@@ -213,8 +211,8 @@ export function createGrpcWebTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);

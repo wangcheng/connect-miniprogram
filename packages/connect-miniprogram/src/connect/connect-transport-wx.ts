@@ -17,23 +17,20 @@ import type {
   Transport,
   UnaryResponse,
 } from '@connectrpc/connect';
-import { appendHeaders } from '@connectrpc/connect';
-import { ConnectError } from '@connectrpc/connect';
+import { appendHeaders, ConnectError } from '@connectrpc/connect';
 import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 import {
   createClientMethodSerializers,
   createMethodUrl,
+  encodeEnvelope,
 } from '@connectrpc/connect/protocol';
-import { encodeEnvelope } from '@connectrpc/connect/protocol';
 import {
+  endStreamFlag,
+  endStreamFromJson,
   errorFromJson,
   requestHeader,
   trailerDemux,
   validateResponse,
-} from '@connectrpc/connect/protocol-connect';
-import {
-  endStreamFlag,
-  endStreamFromJson,
 } from '@connectrpc/connect/protocol-connect';
 import { headersToObject } from 'headers-polyfill';
 
@@ -77,8 +74,8 @@ export function createConnectTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
 
@@ -105,6 +102,7 @@ export function createConnectTransport(
 
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
+      useBinaryFormat,
       response.statusCode,
       response.header,
     );
@@ -205,8 +203,8 @@ export function createConnectTransport(
       timeoutMs === undefined
         ? options.defaultTimeoutMs
         : timeoutMs <= 0
-        ? undefined
-        : timeoutMs;
+          ? undefined
+          : timeoutMs;
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(
