@@ -5,6 +5,10 @@
     "packages/example-taro",
     "packages/example-mina"
   ],
+  "scripts": {
+    "build": "yarn workspace connect-miniprogram build",
+    "dev:taro": "yarn workspace example-taro dev:weapp"
+  },
   "prettier": {
     "arrowParens": "always",
     "bracketSpacing": true,

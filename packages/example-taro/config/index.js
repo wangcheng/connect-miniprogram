@@ -1,3 +1,5 @@
+const path = require('node:path');
+
 const config = {
   projectName: 'example-taro',
   date: '2023-10-28',
@@ -21,6 +23,9 @@ const config = {
     enable: false, // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
   },
   mini: {
+    compile: {
+      include: [path.resolve(__dirname, '../../connect-miniprogram/src')],
+    },
     postcss: {
       pxtransform: {
         enable: true,
@@ -39,15 +44,6 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]',
         },
       },
-    },
-    webpackChain: (chain, webpack) => {
-      chain.plugin('shimming').use(webpack.ProvidePlugin, [
-        {
-          Headers: ['connect-miniprogram/shims.js', 'HeadersPolyfill'],
-          TextDecoder: ['connect-miniprogram/shims.js', 'FastTextDecoder'],
-          TextEncoder: ['connect-miniprogram/shims.js', 'FastTextEncoder'],
-        },
-      ]);
     },
   },
   h5: {
