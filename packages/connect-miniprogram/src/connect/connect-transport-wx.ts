@@ -24,6 +24,7 @@ import {
   createClientMethodSerializers,
   createMethodUrl,
   encodeEnvelope,
+  getJsonOptions,
 } from '@connectrpc/connect/protocol';
 import {
   endStreamFlag,
@@ -45,9 +46,10 @@ import {
 export function createConnectTransport(
   options: CreateTransportOptions,
 ): Transport {
-  const request = createWxRequestAsPromise(options);
-
   const useBinaryFormat = options.useBinaryFormat ?? false;
+
+  const requestAsPromise = createWxRequestAsPromise(options, useBinaryFormat);
+  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function unary<
     I extends Message<I> = AnyMessage,
@@ -95,7 +97,7 @@ export function createConnectTransport(
 
     const body = serialize(reqMessage);
 
-    const response = await request({
+    const response = await requestAsPromise({
       url,
       header: reqHeader,
       data: body.buffer,
@@ -121,13 +123,16 @@ export function createConnectTransport(
       service,
       method,
       header: demuxedHeader,
-      message: parse(new Uint8Array(response.data as ArrayBuffer)),
+      message: useBinaryFormat
+        ? parse(new Uint8Array(response.data as ArrayBuffer))
+        : method.O.fromJson(
+            response.data as string,
+            getJsonOptions(options.jsonOptions),
+          ),
       trailer: demuxedTrailer,
     };
     return result;
   }
-
-  const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
   async function stream<
     I extends Message<I> = AnyMessage,

@@ -142,17 +142,17 @@ export function createWxRequestAsAsyncGenerator({
   return (options: PartialOptions) => demuxStream(reqFn(options));
 }
 
-export function createWxRequestAsPromise({
-  request,
-  requestOptions,
-}: CreateTransportOptions) {
+export function createWxRequestAsPromise(
+  { request, requestOptions }: CreateTransportOptions,
+  useBinaryFormat: boolean,
+) {
   return (options: PartialOptions) =>
     new Promise<{ data: any; statusCode: number; header: Headers }>(
       (resolve, reject) => {
         request({
           ...convertOptionsWithHeader(options),
           ...requestOptions,
-          responseType: 'arraybuffer',
+          responseType: useBinaryFormat ? 'arraybuffer' : 'text',
           success: ({ data, statusCode, header }) =>
             resolve({
               data,
