@@ -1856,39 +1856,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@buf/connectrpc_eliza.bufbuild_es@npm:1.7.2-20230913231627-233fca715f49.2":
-  version: 1.7.2-20230913231627-233fca715f49.2
-  resolution: "@buf/connectrpc_eliza.bufbuild_es@npm:1.7.2-20230913231627-233fca715f49.2"
+"@buf/connectrpc_eliza.bufbuild_es@npm:1.10.0-20230913231627-233fca715f49.1":
+  version: 1.10.0-20230913231627-233fca715f49.1
+  resolution: "@buf/connectrpc_eliza.bufbuild_es@npm:1.10.0-20230913231627-233fca715f49.1"
   peerDependencies:
-    "@bufbuild/protobuf": ^1.7.2
-  checksum: 10c0/665af017d2fd87a75b9ea2ac2dbf23f8406f6cf14a39b94ee8110023726310085f28a1023bf8bc176d2234c2d2e09253783d559ba7695ada82dc6af6e3fff217
+    "@bufbuild/protobuf": ^1.10.0
+  checksum: 10c0/1336952498db3cca24cb85ff9f27ba7a334466f21ec6fb5f2c390460c18d8a061e7dcadfe000e1ab0141467e29596f0d58269f708d3da5ccf048f668ce5fbc40
   languageName: node
   linkType: hard
 
-"@buf/connectrpc_eliza.connectrpc_es@npm:~1.4.0-20230913231627-233fca715f49.3":
-  version: 1.4.0-20230913231627-233fca715f49.3
-  resolution: "@buf/connectrpc_eliza.connectrpc_es@npm:1.4.0-20230913231627-233fca715f49.3"
+"@buf/connectrpc_eliza.connectrpc_es@npm:~1.6.1-20230913231627-233fca715f49.1":
+  version: 1.6.1-20230913231627-233fca715f49.1
+  resolution: "@buf/connectrpc_eliza.connectrpc_es@npm:1.6.1-20230913231627-233fca715f49.1"
   dependencies:
-    "@buf/connectrpc_eliza.bufbuild_es": "npm:1.7.2-20230913231627-233fca715f49.2"
+    "@buf/connectrpc_eliza.bufbuild_es": "npm:1.10.0-20230913231627-233fca715f49.1"
   peerDependencies:
-    "@connectrpc/connect": ^1.4.0
-  checksum: 10c0/d78b917087597d4925748bb273372080bb7c8c13d5cc8b3d62c8ff162a4b60933bcc7fe97d7843a31cb6e6fdc96aecda17cc254284cd352869f9da3bbd5a2d94
+    "@connectrpc/connect": ^1.6.1
+  checksum: 10c0/56b8bbbea59e3e047f8086e91299fbe46fad7ec41b71b13721197283c60454e95c34dab49977dd41215ac004c0aa20c52d51ab9471212f131480356dc7503d87
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:~1.8.0":
-  version: 1.8.0
-  resolution: "@bufbuild/protobuf@npm:1.8.0"
-  checksum: 10c0/1f8a5a780f6272e7e8d8bb835c2b474485bf9e92213bef96f0fcd550fd77db064c145a5dabdc7b2121167c530fd28b09723d144a6c6baff88296ce6f5860808d
+"@bufbuild/protobuf@npm:~1.10.0":
+  version: 1.10.0
+  resolution: "@bufbuild/protobuf@npm:1.10.0"
+  checksum: 10c0/5487b9c2e63846d0e3bde4d025cc77ae44a22166a5d6c184df0da5581e1ab6d66dd115af0ccad814576dcd011bb1b93989fb0ac1eb4ae452979bb8b186693ba0
   languageName: node
   linkType: hard
 
-"@connectrpc/connect@npm:~1.4.0":
-  version: 1.4.0
-  resolution: "@connectrpc/connect@npm:1.4.0"
+"@connectrpc/connect@npm:~1.6.1":
+  version: 1.6.1
+  resolution: "@connectrpc/connect@npm:1.6.1"
   peerDependencies:
-    "@bufbuild/protobuf": ^1.4.2
-  checksum: 10c0/6006e4aef6908a786ffbda6f7c9c92fe0906e031e891c7ce28de9d1b8e3feb9115d924ec6fc38131a5b9936b537594b0a828711e3e0544f760c78e010eda1ea1
+    "@bufbuild/protobuf": ^1.10.0
+  checksum: 10c0/35c6fd3e33c3a1ff9dce230b059ecd7991ef0dc60c16fb898e5c46b930a01077ac0b34d53d6742cc8ed079f20f8eacc7c77a8620aeec9efaf68950494f387011
   languageName: node
   linkType: hard
 
@@ -5925,8 +5925,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "connect-miniprogram@workspace:packages/connect-miniprogram"
   dependencies:
-    "@bufbuild/protobuf": "npm:~1.8.0"
-    "@connectrpc/connect": "npm:~1.4.0"
+    "@bufbuild/protobuf": "npm:~1.10.0"
+    "@connectrpc/connect": "npm:~1.6.1"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
     eslint: "npm:^8.57.1"
@@ -5936,8 +5936,8 @@ __metadata:
     prettier: "npm:^3.3.3"
     typescript: "npm:^5.6.3"
   peerDependencies:
-    "@bufbuild/protobuf": ~1.8.0
-    "@connectrpc/connect": ~1.4.0
+    "@bufbuild/protobuf": ~1.10.0
+    "@connectrpc/connect": ~1.6.1
   languageName: unknown
   linkType: soft
 
@@ -8150,9 +8150,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-mina@workspace:packages/example-mina"
   dependencies:
-    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.4.0-20230913231627-233fca715f49.3"
-    "@bufbuild/protobuf": "npm:~1.8.0"
-    "@connectrpc/connect": "npm:~1.4.0"
+    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.1"
+    "@bufbuild/protobuf": "npm:~1.10.0"
+    "@connectrpc/connect": "npm:~1.6.1"
     connect-miniprogram: "workspace:packages/connect-miniprogram"
     esbuild: "npm:^0.24.0"
   languageName: unknown
@@ -8164,9 +8164,9 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.25.8"
     "@babel/runtime": "npm:^7.25.7"
-    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.4.0-20230913231627-233fca715f49.3"
-    "@bufbuild/protobuf": "npm:~1.8.0"
-    "@connectrpc/connect": "npm:~1.4.0"
+    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.1"
+    "@bufbuild/protobuf": "npm:~1.10.0"
+    "@connectrpc/connect": "npm:~1.6.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.5.15"
     "@tarojs/cli": "npm:3.6.35"
     "@tarojs/components": "npm:3.6.35"

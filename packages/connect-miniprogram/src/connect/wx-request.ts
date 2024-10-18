@@ -35,6 +35,8 @@ export class WeixinRequestError extends Error {
 // convert native Headers object to plain object which is supported by wx.request
 function convertOptionsWithHeader(options: PartialOptions) {
   const { header, ...rest } = options;
+  // Weixin will refuse to send User-Agent header of a request. So we need to delete it before sending the request.
+  header?.delete('User-Agent');
   return {
     ...rest,
     ...(header ? { header: headersToObject(header) } : {}),

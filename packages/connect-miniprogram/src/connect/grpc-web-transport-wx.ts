@@ -74,9 +74,6 @@ export function createGrpcWebTransport(
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
-
-    reqHeader.delete('User-Agent');
-
     const req = encodeEnvelope(0, serialize(normalize(method.I, message)));
 
     const response = await requestAsAsyncIterable({
@@ -218,9 +215,6 @@ export function createGrpcWebTransport(
 
     const url = createMethodUrl(options.baseUrl, service, method);
     const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
-
-    reqHeader.delete('User-Agent');
-
     const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
@@ -230,10 +224,14 @@ export function createGrpcWebTransport(
       method: 'POST',
     });
 
-    const { foundStatus } = validateResponse(
+    const { foundStatus, headerError } = validateResponse(
       response.statusCode,
       response.header,
     );
+
+    if (headerError != undefined) {
+      throw headerError;
+    }
 
     const trailerTarget = new Headers();
 
