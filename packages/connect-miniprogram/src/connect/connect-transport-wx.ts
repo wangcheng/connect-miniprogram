@@ -89,8 +89,6 @@ export function createConnectTransport(
       false,
     );
 
-    reqHeader.delete('User-Agent');
-
     // start of custom code
     // `normalize` is called in `runUnaryCall` in the upstream implementation. becuase we don't support runUnaryCall, we need to call normalize here
     const reqMessage = normalize(method.I, message);
@@ -228,9 +226,6 @@ export function createConnectTransport(
       header,
       false,
     );
-
-    reqHeader.delete('User-Agent');
-
     const reqMessage = normalizeIterable(method.I, input);
     const body = await createRequestBody(reqMessage);
     const response = await requestAsAsyncIterable({
