@@ -1876,10 +1876,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:~1.8.0":
-  version: 1.8.0
-  resolution: "@bufbuild/protobuf@npm:1.8.0"
-  checksum: 10c0/1f8a5a780f6272e7e8d8bb835c2b474485bf9e92213bef96f0fcd550fd77db064c145a5dabdc7b2121167c530fd28b09723d144a6c6baff88296ce6f5860808d
+"@bufbuild/protobuf@npm:~1.10.0":
+  version: 1.10.0
+  resolution: "@bufbuild/protobuf@npm:1.10.0"
+  checksum: 10c0/5487b9c2e63846d0e3bde4d025cc77ae44a22166a5d6c184df0da5581e1ab6d66dd115af0ccad814576dcd011bb1b93989fb0ac1eb4ae452979bb8b186693ba0
   languageName: node
   linkType: hard
 
@@ -5925,7 +5925,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "connect-miniprogram@workspace:packages/connect-miniprogram"
   dependencies:
-    "@bufbuild/protobuf": "npm:~1.8.0"
+    "@bufbuild/protobuf": "npm:~1.10.0"
     "@connectrpc/connect": "npm:~1.6.1"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
@@ -5936,8 +5936,8 @@ __metadata:
     prettier: "npm:^3.3.3"
     typescript: "npm:^5.6.3"
   peerDependencies:
-    "@bufbuild/protobuf": ~1.8.0
-    "@connectrpc/connect": ~1.4.0
+    "@bufbuild/protobuf": ~1.10.0
+    "@connectrpc/connect": ~1.6.1
   languageName: unknown
   linkType: soft
 
@@ -8151,7 +8151,7 @@ __metadata:
   resolution: "example-mina@workspace:packages/example-mina"
   dependencies:
     "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.1"
-    "@bufbuild/protobuf": "npm:~1.8.0"
+    "@bufbuild/protobuf": "npm:~1.10.0"
     "@connectrpc/connect": "npm:~1.6.1"
     connect-miniprogram: "workspace:packages/connect-miniprogram"
     esbuild: "npm:^0.24.0"
@@ -8165,7 +8165,7 @@ __metadata:
     "@babel/core": "npm:^7.25.8"
     "@babel/runtime": "npm:^7.25.7"
     "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.1"
-    "@bufbuild/protobuf": "npm:~1.8.0"
+    "@bufbuild/protobuf": "npm:~1.10.0"
     "@connectrpc/connect": "npm:~1.6.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.5.15"
     "@tarojs/cli": "npm:3.6.35"
