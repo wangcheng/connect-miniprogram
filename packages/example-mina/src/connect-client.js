@@ -1,4 +1,4 @@
-import { createPromiseClient } from '@connectrpc/connect';
+import { createClient } from '@connectrpc/connect';
 import {
   createConnectTransport,
   createGrpcWebTransport,
@@ -15,7 +15,7 @@ const grpcTransport = createGrpcWebTransport({
   isDevTool,
 });
 
-const grpcClient = createPromiseClient(ElizaService, grpcTransport);
+const grpcClient = createClient(ElizaService, grpcTransport);
 
 const connectTransport = createConnectTransport({
   baseUrl,
@@ -23,7 +23,7 @@ const connectTransport = createConnectTransport({
   isDevTool,
 });
 
-const connectClient = createPromiseClient(ElizaService, connectTransport);
+const connectClient = createClient(ElizaService, connectTransport);
 
 export async function main() {
   connectClient
