@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type { MessageType, PartialMessage } from '@bufbuild/protobuf';
-import { Message } from '@bufbuild/protobuf';
+/**
+ * @see https://github.com/connectrpc/connect-es/blob/main/packages/connect/src/protocol/normalize.ts
+ */
+
+import type { Message, MessageType, PartialMessage } from '@bufbuild/protobuf';
 
 /**
  *  Takes a partial protobuf messages of the
@@ -23,7 +26,9 @@ export function normalize<T extends Message<T>>(
   type: MessageType<T>,
   message: T | PartialMessage<T>,
 ) {
-  return message instanceof Message ? message : new type(message);
+  return message instanceof type
+    ? message
+    : new type(message as PartialMessage<T>);
 }
 
 /**

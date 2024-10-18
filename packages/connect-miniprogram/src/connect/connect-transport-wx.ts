@@ -17,9 +17,10 @@ import type {
   Transport,
   UnaryResponse,
 } from '@connectrpc/connect';
-import { appendHeaders, ConnectError } from '@connectrpc/connect';
+import { appendHeaders, Code, ConnectError } from '@connectrpc/connect';
 import type { EnvelopedMessage } from '@connectrpc/connect/protocol';
 import {
+  compressedFlag,
   createClientMethodSerializers,
   createMethodUrl,
   encodeEnvelope,
@@ -89,6 +90,8 @@ export function createConnectTransport(
 
     reqHeader.delete('User-Agent');
 
+    // start of custom code
+    // `normalize` is called in `runUnaryCall` in the upstream implementation. becuase we don't support runUnaryCall, we need to call normalize here
     const reqMessage = normalize(method.I, message);
 
     const body = serialize(reqMessage);
@@ -99,10 +102,10 @@ export function createConnectTransport(
       data: body.buffer,
       method: 'POST',
     });
+    // end of custom code
 
     const { isUnaryError, unaryError } = validateResponse(
       method.kind,
-      useBinaryFormat,
       response.statusCode,
       response.header,
     );
@@ -115,12 +118,12 @@ export function createConnectTransport(
     }
     const [demuxedHeader, demuxedTrailer] = trailerDemux(response.header);
     const result: UnaryResponse<I, O> = {
-      service,
-      header: demuxedHeader as any as Headers,
-      trailer: demuxedTrailer as any as Headers,
       stream: false,
+      service,
       method,
+      header: demuxedHeader,
       message: parse(new Uint8Array(response.data as ArrayBuffer)),
+      trailer: demuxedTrailer,
     };
     return result;
   }
@@ -161,6 +164,12 @@ export function createConnectTransport(
             break;
           }
           const { flags, data } = result.value;
+          if ((flags & compressedFlag) === compressedFlag) {
+            throw new ConnectError(
+              `protocol error: received unsupported compressed output`,
+              Code.Internal,
+            );
+          }
           if ((flags & endStreamFlag) === endStreamFlag) {
             endStreamReceived = true;
             const endStream = endStreamFromJson(data);
