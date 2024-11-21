@@ -40,7 +40,7 @@
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "miniprogram-api-typings": "^4.0.1",
+    "miniprogram-api-typings": "^4.0.2",
     "prettier": "^3.3.3",
     "typescript": "^5.6.3"
   }
