@@ -1843,7 +1843,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:~2.2.2":
+"@bufbuild/protobuf@npm:^2.2.0":
   version: 2.2.2
   resolution: "@bufbuild/protobuf@npm:2.2.2"
   checksum: 10c0/17687c36c85b2e489c7ffd676479c54e12437270eb5a724775cb880b09948cad205b79e5822a4d10cefde0eef433b781350d73bb649d8de9e84d7745871ee719
@@ -5898,7 +5898,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "connect-miniprogram@workspace:packages/connect-miniprogram"
   dependencies:
-    "@bufbuild/protobuf": "npm:~2.2.2"
+    "@bufbuild/protobuf": "npm:^2.2.0"
     "@connectrpc/connect": "npm:~2.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
@@ -5909,7 +5909,7 @@ __metadata:
     prettier: "npm:^3.3.3"
     typescript: "npm:^5.6.3"
   peerDependencies:
-    "@bufbuild/protobuf": ~2.2.2
+    "@bufbuild/protobuf": ^2.2.0
     "@connectrpc/connect": ~2.0.0
   languageName: unknown
   linkType: soft
@@ -8118,7 +8118,7 @@ __metadata:
   resolution: "example-mina@workspace:packages/example-mina"
   dependencies:
     "@buf/connectrpc_eliza.bufbuild_es": "npm:^2.2.2-20230913231627-233fca715f49.2"
-    "@bufbuild/protobuf": "npm:~2.2.2"
+    "@bufbuild/protobuf": "npm:^2.2.0"
     "@connectrpc/connect": "npm:~2.0.0"
     connect-miniprogram: "workspace:packages/connect-miniprogram"
     esbuild: "npm:^0.24.0"
@@ -8132,7 +8132,7 @@ __metadata:
     "@babel/core": "npm:^7.26.0"
     "@babel/runtime": "npm:^7.26.0"
     "@buf/connectrpc_eliza.bufbuild_es": "npm:^2.2.2-20230913231627-233fca715f49.2"
-    "@bufbuild/protobuf": "npm:~2.2.2"
+    "@bufbuild/protobuf": "npm:^2.2.0"
     "@connectrpc/connect": "npm:~2.0.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.5.15"
     "@tarojs/cli": "npm:3.6.35"
