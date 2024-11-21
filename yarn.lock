@@ -1834,23 +1834,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@buf/connectrpc_eliza.bufbuild_es@npm:1.10.0-20230913231627-233fca715f49.1":
-  version: 1.10.0-20230913231627-233fca715f49.1
-  resolution: "@buf/connectrpc_eliza.bufbuild_es@npm:1.10.0-20230913231627-233fca715f49.1"
+"@buf/connectrpc_eliza.bufbuild_es@npm:^2.2.2-20230913231627-233fca715f49.2":
+  version: 2.2.2-20230913231627-233fca715f49.2
+  resolution: "@buf/connectrpc_eliza.bufbuild_es@npm:2.2.2-20230913231627-233fca715f49.2"
   peerDependencies:
-    "@bufbuild/protobuf": ^1.10.0
-  checksum: 10c0/1336952498db3cca24cb85ff9f27ba7a334466f21ec6fb5f2c390460c18d8a061e7dcadfe000e1ab0141467e29596f0d58269f708d3da5ccf048f668ce5fbc40
-  languageName: node
-  linkType: hard
-
-"@buf/connectrpc_eliza.connectrpc_es@npm:~1.6.1-20230913231627-233fca715f49.2":
-  version: 1.6.1-20230913231627-233fca715f49.2
-  resolution: "@buf/connectrpc_eliza.connectrpc_es@npm:1.6.1-20230913231627-233fca715f49.2"
-  dependencies:
-    "@buf/connectrpc_eliza.bufbuild_es": "npm:1.10.0-20230913231627-233fca715f49.1"
-  peerDependencies:
-    "@connectrpc/connect": ^1.6.1
-  checksum: 10c0/c58febece228a9e3f8dd15e36cacf2136441754f2a48ecee88aef502e97dd78c810a6ec527036121971ae9bbacfbdb965833dc5698d34cd462fa3c479839cd59
+    "@bufbuild/protobuf": ^2.2.2
+  checksum: 10c0/5511558daf6a5fa8234f7c4a6f3e60896eae1a3defb3a7be045636e8ded887d5ad412d72c621facbf1cdf2cf7a6c03ab4d9f61ce2ea85ffa6df4da18f69cb8bd
   languageName: node
   linkType: hard
 
@@ -8128,7 +8117,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-mina@workspace:packages/example-mina"
   dependencies:
-    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.2"
+    "@buf/connectrpc_eliza.bufbuild_es": "npm:^2.2.2-20230913231627-233fca715f49.2"
     "@bufbuild/protobuf": "npm:~2.2.2"
     "@connectrpc/connect": "npm:~2.0.0"
     connect-miniprogram: "workspace:packages/connect-miniprogram"
@@ -8142,7 +8131,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.26.0"
     "@babel/runtime": "npm:^7.26.0"
-    "@buf/connectrpc_eliza.connectrpc_es": "npm:~1.6.1-20230913231627-233fca715f49.2"
+    "@buf/connectrpc_eliza.bufbuild_es": "npm:^2.2.2-20230913231627-233fca715f49.2"
     "@bufbuild/protobuf": "npm:~2.2.2"
     "@connectrpc/connect": "npm:~2.0.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.5.15"
