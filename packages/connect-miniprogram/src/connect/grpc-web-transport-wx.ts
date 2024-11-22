@@ -3,13 +3,12 @@
  */
 
 import type {
-  AnyMessage,
-  Message,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
+  DescMessage,
+  DescMethodStreaming,
+  DescMethodUnary,
+  MessageInitShape,
+  MessageShape,
 } from '@bufbuild/protobuf';
-import { MethodKind } from '@bufbuild/protobuf';
 import type {
   ContextValues,
   StreamResponse,
@@ -25,6 +24,7 @@ import {
   encodeEnvelope,
 } from '@connectrpc/connect/protocol';
 import {
+  headerGrpcStatus,
   requestHeader,
   trailerFlag,
   trailerParse,
@@ -44,216 +44,241 @@ export function createGrpcWebTransport(
 
   const requestAsAsyncIterable = createWxRequestAsAsyncGenerator(options);
 
-  async function unary<
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
-    signal: AbortSignal | undefined,
-    timeoutMs: number | undefined,
-    header: Record<string, string> | undefined,
-    message: PartialMessage<I>,
-    contextValues?: ContextValues,
-  ): Promise<UnaryResponse<I, O>> {
-    warnUnsupportedOptions(signal, contextValues);
+  return {
+    async unary<I extends DescMessage, O extends DescMessage>(
+      method: DescMethodUnary<I, O>,
+      signal: AbortSignal | undefined,
+      timeoutMs: number | undefined,
+      header: Record<string, string> | undefined,
+      message: MessageInitShape<I>,
+      contextValues?: ContextValues,
+    ): Promise<UnaryResponse<I, O>> {
+      warnUnsupportedOptions(signal, contextValues);
 
-    const { serialize, parse } = createClientMethodSerializers(
-      method,
-      useBinaryFormat,
-      options.jsonOptions,
-      options.binaryOptions,
-    );
+      const { serialize, parse } = createClientMethodSerializers(
+        method,
+        useBinaryFormat,
+        options.jsonOptions,
+        options.binaryOptions,
+      );
 
-    timeoutMs =
-      timeoutMs === undefined
-        ? options.defaultTimeoutMs
-        : timeoutMs <= 0
-          ? undefined
-          : timeoutMs;
+      timeoutMs =
+        timeoutMs === undefined
+          ? options.defaultTimeoutMs
+          : timeoutMs <= 0
+            ? undefined
+            : timeoutMs;
 
-    const url = createMethodUrl(options.baseUrl, service, method);
-    const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
-    const req = encodeEnvelope(0, serialize(normalize(method.I, message)));
+      const url = createMethodUrl(options.baseUrl, method);
+      const reqHeader = requestHeader(
+        useBinaryFormat,
+        timeoutMs,
+        header,
+        false,
+      );
+      // normalize message @see https://github.com/connectrpc/connect-es/blob/main/packages/connect/src/protocol/run-call.ts
+      const reqMessage = normalize(method.input, message);
+      const req = encodeEnvelope(0, serialize(reqMessage));
 
-    const response = await requestAsAsyncIterable({
-      url,
-      header: reqHeader,
-      data: req.buffer,
-      method: 'POST',
-    });
+      const response = await requestAsAsyncIterable({
+        url,
+        header: reqHeader,
+        data: req.buffer,
+        method: 'POST',
+      });
 
-    validateResponse(response.statusCode, response.header);
+      const { headerError } = validateResponse(
+        response.statusCode,
+        response.header,
+      );
 
-    let resTrailer: Headers | undefined;
-    let resMessage: O | undefined;
-    for await (const chunk of response.messageStream) {
-      const { flags, data } = chunk;
-      if ((flags & compressedFlag) === compressedFlag) {
-        throw new ConnectError(
-          `protocol error: received unsupported compressed output`,
-          Code.Internal,
-        );
+      if (!response.messageStream) {
+        if (headerError !== undefined) throw headerError;
+        throw 'missing response body';
       }
-      if (flags === trailerFlag) {
-        if (resTrailer !== undefined) {
-          throw 'extra trailer';
-        }
-        // Unary responses require exactly one response message, but in
-        // case of an error, it is perfectly valid to have a response body
-        // that only contains error trailers.
-        resTrailer = trailerParse(data);
-        continue;
-      }
-      if (resMessage !== undefined) {
-        throw 'extra message';
-      }
-      resMessage = parse(data);
-    }
-    if (resTrailer === undefined) {
-      throw 'missing trailer';
-    }
-    validateTrailer(resTrailer, response.header);
-    if (resMessage === undefined) {
-      throw 'missing message';
-    }
 
-    return {
-      stream: false,
-      service,
-      method,
-      header: response.header,
-      message: resMessage,
-      trailer: resTrailer,
-    };
-  }
-
-  async function stream<I extends Message<I>, O extends Message<O>>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
-    signal: AbortSignal | undefined,
-    timeoutMs: number | undefined,
-    header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
-    contextValues?: ContextValues,
-  ): Promise<StreamResponse<I, O>> {
-    warnUnsupportedOptions(signal, contextValues);
-
-    const { serialize, parse } = createClientMethodSerializers(
-      method,
-      useBinaryFormat,
-      options.jsonOptions,
-      options.binaryOptions,
-    );
-
-    async function* parseResponseBody(
-      input: AsyncGenerator<EnvelopedMessage>,
-      foundStatus: boolean,
-      trailerTarget: Headers,
-      header: Headers,
-    ) {
-      if (foundStatus) {
-        // A grpc-status: 0 response header was present. This is a "trailers-only"
-        // response (a response without a body and no trailers).
-        //
-        // The spec seems to disallow a trailers-only response for status 0 - we are
-        // lenient and only verify that the body is empty.
-        //
-        // > [...] Trailers-Only is permitted for calls that produce an immediate error.
-        // See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
-        if (!(await input.next()).done) {
-          throw 'extra data for trailers-only';
-        }
-        return;
-      }
-      let trailerReceived = false;
-      for await (const chunk of input) {
+      let resTrailer: Headers | undefined;
+      let resMessage: MessageShape<O> | undefined;
+      for await (const chunk of response.messageStream) {
         const { flags, data } = chunk;
-
-        if ((flags & trailerFlag) === trailerFlag) {
-          if (trailerReceived) {
+        if ((flags & compressedFlag) === compressedFlag) {
+          throw new ConnectError(
+            `protocol error: received unsupported compressed output`,
+            Code.Internal,
+          );
+        }
+        if (flags === trailerFlag) {
+          if (resTrailer !== undefined) {
             throw 'extra trailer';
           }
-          trailerReceived = true;
-          const trailer = trailerParse(data);
-
-          validateTrailer(trailer, header);
-          trailer.forEach((value, key) => trailerTarget.set(key, value));
-
+          // Unary responses require exactly one response message, but in
+          // case of an error, it is perfectly valid to have a response body
+          // that only contains error trailers.
+          resTrailer = trailerParse(data);
           continue;
         }
-        if (trailerReceived) {
-          throw 'extra message';
+        if (resMessage !== undefined) {
+          throw new ConnectError('extra message', Code.Unimplemented);
         }
-        yield parse(data);
-        continue;
+        resMessage = parse(data);
       }
-      if (!trailerReceived) {
-        throw 'missing trailer';
+      if (resTrailer === undefined) {
+        if (headerError !== undefined) throw headerError;
+        throw new ConnectError(
+          'missing trailer',
+          response.header.has(headerGrpcStatus)
+            ? Code.Unimplemented
+            : Code.Unknown,
+        );
       }
-    }
-
-    async function createRequestBody(
-      input: AsyncIterable<I>,
-    ): Promise<Uint8Array> {
-      if (method.kind != MethodKind.ServerStreaming) {
-        throw 'Weixin does not support streaming request bodies';
+      validateTrailer(resTrailer, response.header);
+      if (resMessage === undefined) {
+        throw new ConnectError(
+          'missing message',
+          resTrailer.has(headerGrpcStatus) ? Code.Unimplemented : Code.Unknown,
+        );
       }
-      const r = await input[Symbol.asyncIterator]().next();
-      if (r.done == true) {
-        throw 'missing request message';
+
+      return {
+        stream: false,
+        service: method.parent,
+        method,
+        header: response.header,
+        message: resMessage,
+        trailer: resTrailer,
+      };
+    },
+
+    async stream<I extends DescMessage, O extends DescMessage>(
+      method: DescMethodStreaming<I, O>,
+      signal: AbortSignal | undefined,
+      timeoutMs: number | undefined,
+      header: HeadersInit | undefined,
+      input: AsyncIterable<MessageInitShape<I>>,
+      contextValues?: ContextValues,
+    ): Promise<StreamResponse<I, O>> {
+      warnUnsupportedOptions(signal, contextValues);
+
+      const { serialize, parse } = createClientMethodSerializers(
+        method,
+        useBinaryFormat,
+        options.jsonOptions,
+        options.binaryOptions,
+      );
+
+      async function* parseResponseBody(
+        input: AsyncGenerator<EnvelopedMessage>,
+        foundStatus: boolean,
+        trailerTarget: Headers,
+        header: Headers,
+      ) {
+        if (foundStatus) {
+          // A grpc-status: 0 response header was present. This is a "trailers-only"
+          // response (a response without a body and no trailers).
+          //
+          // The spec seems to disallow a trailers-only response for status 0 - we are
+          // lenient and only verify that the body is empty.
+          //
+          // > [...] Trailers-Only is permitted for calls that produce an immediate error.
+          // See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+          if (!(await input.next()).done) {
+            throw 'extra data for trailers-only';
+          }
+          return;
+        }
+        let trailerReceived = false;
+        for await (const chunk of input) {
+          const { flags, data } = chunk;
+
+          if ((flags & trailerFlag) === trailerFlag) {
+            if (trailerReceived) {
+              throw 'extra trailer';
+            }
+            trailerReceived = true;
+            const trailer = trailerParse(data);
+
+            validateTrailer(trailer, header);
+            trailer.forEach((value, key) => trailerTarget.set(key, value));
+
+            continue;
+          }
+          if (trailerReceived) {
+            throw 'extra message';
+          }
+          yield parse(data);
+          continue;
+        }
+        if (!trailerReceived) {
+          throw 'missing trailer';
+        }
       }
-      return encodeEnvelope(0, serialize(r.value));
-    }
 
-    timeoutMs =
-      timeoutMs === undefined
-        ? options.defaultTimeoutMs
-        : timeoutMs <= 0
-          ? undefined
-          : timeoutMs;
+      async function createRequestBody(
+        input: AsyncIterable<MessageShape<I>>,
+      ): Promise<Uint8Array> {
+        if (method.methodKind != 'server_streaming') {
+          throw 'Weixin does not support streaming request bodies';
+        }
+        const r = await input[Symbol.asyncIterator]().next();
+        if (r.done == true) {
+          throw 'missing request message';
+        }
+        return encodeEnvelope(0, serialize(r.value));
+      }
 
-    const url = createMethodUrl(options.baseUrl, service, method);
-    const reqHeader = requestHeader(useBinaryFormat, timeoutMs, header, false);
-    const reqMessage = normalizeIterable(method.I, input);
-    const body = await createRequestBody(reqMessage);
-    const response = await requestAsAsyncIterable({
-      url,
-      header: reqHeader,
-      data: body.buffer,
-      method: 'POST',
-    });
+      timeoutMs =
+        timeoutMs === undefined
+          ? options.defaultTimeoutMs
+          : timeoutMs <= 0
+            ? undefined
+            : timeoutMs;
 
-    const { foundStatus, headerError } = validateResponse(
-      response.statusCode,
-      response.header,
-    );
+      const url = createMethodUrl(options.baseUrl, method);
+      const reqHeader = requestHeader(
+        useBinaryFormat,
+        timeoutMs,
+        header,
+        false,
+      );
+      const reqMessage = normalizeIterable(method.input, input);
+      const body = await createRequestBody(reqMessage);
+      const response = await requestAsAsyncIterable({
+        url,
+        header: reqHeader,
+        data: body.buffer,
+        method: 'POST',
+      });
 
-    if (headerError != undefined) {
-      throw headerError;
-    }
+      const { foundStatus, headerError } = validateResponse(
+        response.statusCode,
+        response.header,
+      );
 
-    const trailerTarget = new Headers();
+      if (headerError != undefined) {
+        throw headerError;
+      }
 
-    const resMessage = await parseResponseBody(
-      response.messageStream,
-      foundStatus,
-      trailerTarget,
-      response.header,
-    );
+      if (!response.messageStream) {
+        throw 'missing response body';
+      }
 
-    return {
-      service,
-      method,
-      stream: true,
-      header: response.header,
-      trailer: trailerTarget,
-      message: resMessage,
-    };
-  }
+      const trailerTarget = new Headers();
 
-  return {
-    unary,
-    stream,
+      const resMessage = await parseResponseBody(
+        response.messageStream,
+        foundStatus,
+        trailerTarget,
+        response.header,
+      );
+
+      return {
+        service: method.parent,
+        method,
+        stream: true,
+        header: response.header,
+        trailer: trailerTarget,
+        message: resMessage,
+      };
+    },
   };
 }

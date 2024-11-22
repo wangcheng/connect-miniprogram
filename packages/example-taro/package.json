@@ -33,10 +33,10 @@
     "ios >= 8"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.25.7",
-    "@buf/connectrpc_eliza.connectrpc_es": "~1.6.1-20230913231627-233fca715f49.1",
-    "@bufbuild/protobuf": "~1.10.0",
-    "@connectrpc/connect": "~1.6.1",
+    "@babel/runtime": "^7.26.0",
+    "@buf/connectrpc_eliza.bufbuild_es": "^2.2.2-20230913231627-233fca715f49.2",
+    "@bufbuild/protobuf": "^2.2.0",
+    "@connectrpc/connect": "~2.0.0",
     "@tarojs/components": "3.6.35",
     "@tarojs/helper": "3.6.35",
     "@tarojs/plugin-framework-react": "3.6.35",
@@ -56,11 +56,11 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.8",
+    "@babel/core": "^7.26.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@tarojs/cli": "3.6.35",
     "@tarojs/webpack5-runner": "3.6.35",
-    "@types/react": "^18.3.11",
+    "@types/react": "^18.3.12",
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
@@ -68,11 +68,11 @@
     "eslint": "^8.57.1",
     "eslint-config-taro": "3.6.35",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "postcss": "^8.4.47",
+    "postcss": "^8.4.49",
     "react-refresh": "^0.14.2",
     "typescript": "^5.6.3",
-    "webpack": "5.95.0"
+    "webpack": "5.96.1"
   }
 }
