@@ -42,7 +42,7 @@ import {
   createConnectTransport,
   createGrpcWebTransport,
 } from 'connect-miniprogram';
-import { ElizaService } from '@buf/bufbuild_eliza.bufbuild_connect-es/buf/connect/demo/eliza/v1/eliza_connect';
+import { ElizaService } from '@buf/connectrpc_eliza.bufbuild_es/connectrpc/eliza/v1/eliza_pb';
 
 const connectTransport = createConnectTransport({
   baseUrl: 'https://demo.connectrpc.com',
