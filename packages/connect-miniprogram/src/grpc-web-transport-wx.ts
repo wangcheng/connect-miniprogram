@@ -32,10 +32,10 @@ import {
   validateTrailer,
 } from '@connectrpc/connect/protocol-grpc-web';
 
-import { warnUnsupportedOptions } from './compatbility';
 import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
-import { createWxRequestAsAsyncGenerator } from './wx-request';
+import { warnUnsupportedOptions } from './wx/compatbility';
+import { createWxRequestAsAsyncGenerator } from './wx/wx-request';
 
 export function createGrpcWebTransport(
   options: CreateTransportOptions,
