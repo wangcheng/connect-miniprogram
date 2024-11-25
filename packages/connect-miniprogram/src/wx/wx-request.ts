@@ -126,7 +126,7 @@ async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
   }
 
   return {
-    statusCode: headerChunk.payload.statusCode,
+    statusCode: headerChunk?.payload.statusCode,
     header: new Headers(headerChunk?.payload.header),
     messageStream: createEnvelopeAsyncGenerator(messageStream()),
   };
@@ -136,7 +136,7 @@ export function createWxRequestAsAsyncGenerator({
   request,
   isDevTool,
   requestOptions,
-}: CreateTransportOptions) {
+}: Pick<CreateTransportOptions, 'request' | 'isDevTool' | 'requestOptions'>) {
   /**
    * Weixin devtool has a bug if enableChunked is true.
    * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
@@ -148,7 +148,10 @@ export function createWxRequestAsAsyncGenerator({
 }
 
 export function createWxRequestAsPromise(
-  { request, requestOptions }: CreateTransportOptions,
+  {
+    request,
+    requestOptions,
+  }: Pick<CreateTransportOptions, 'request' | 'requestOptions'>,
   useBinaryFormat: boolean,
 ) {
   return (options: PartialOptions) =>
