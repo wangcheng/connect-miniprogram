@@ -1,6 +1,3 @@
-export { createConnectTransport } from './connect/connect-transport-wx';
-export { createGrpcWebTransport } from './connect/grpc-web-transport-wx';
-export type {
-  AdditionalRequestOptions,
-  CreateTransportOptions,
-} from './connect/types';
+export { createConnectTransport } from './connect-wx/connect-transport-wx';
+export { createGrpcWebTransport } from './connect-wx/grpc-web-transport-wx';
+export type { AdditionalRequestOptions, CreateTransportOptions } from './types';

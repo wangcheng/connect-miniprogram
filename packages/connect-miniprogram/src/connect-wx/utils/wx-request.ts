@@ -1,8 +1,11 @@
 import { headersToObject } from 'headers-polyfill';
 
+import { createEnvelopeAsyncGenerator } from '../../connect/protocol/envelope';
+import type {
+  AdditionalRequestOptions,
+  CreateTransportOptions,
+} from '../../types';
 import { createAsyncGeneratorFromEventPattern } from './async-generator';
-import { createEnvelopeAsyncGenerator } from './envelope';
-import type { AdditionalRequestOptions, CreateTransportOptions } from './types';
 
 export type PartialOptions = Pick<
   WechatMiniprogram.RequestOption,

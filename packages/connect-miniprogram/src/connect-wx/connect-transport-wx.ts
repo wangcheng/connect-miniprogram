@@ -35,13 +35,13 @@ import {
   validateResponse,
 } from '@connectrpc/connect/protocol-connect';
 
-import { warnUnsupportedOptions } from './compatbility';
-import { normalize, normalizeIterable } from './protocol/normalize';
-import type { CreateTransportOptions } from './types';
+import { normalize, normalizeIterable } from '../connect/protocol/normalize';
+import type { CreateTransportOptions } from '../types';
+import { warnUnsupportedOptions } from './utils/compatibility';
 import {
   createWxRequestAsAsyncGenerator,
   createWxRequestAsPromise,
-} from './wx-request';
+} from './utils/wx-request';
 
 export function createConnectTransport(
   options: CreateTransportOptions,
