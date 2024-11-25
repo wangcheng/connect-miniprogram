@@ -34,7 +34,7 @@ import {
 
 import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
-import { warnUnsupportedOptions } from './wx/compatbility';
+import { warnUnsupportedOptions } from './wx/compatibility';
 import { createWxRequestAsAsyncGenerator } from './wx/wx-request';
 
 export function createGrpcWebTransport(
