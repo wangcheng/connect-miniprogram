@@ -115,8 +115,12 @@ function create(
 }
 
 async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
+  const firstChunk = await iterator.next();
+  if (firstChunk.done || firstChunk.value.name !== 'HeadersReceived') {
+    throw new Error('missing header');
+  }
   // first value is header
-  const headerChunk = (await iterator.next()).value as HeadersReceivedEvent;
+  const { statusCode, header } = firstChunk.value.payload;
 
   async function* messageStream() {
     for await (const value of iterator) {
@@ -126,8 +130,8 @@ async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
   }
 
   return {
-    statusCode: headerChunk?.payload.statusCode,
-    header: new Headers(headerChunk?.payload.header),
+    statusCode: statusCode,
+    header: new Headers(header),
     messageStream: createEnvelopeAsyncGenerator(messageStream()),
   };
 }
