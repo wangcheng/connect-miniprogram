@@ -3,7 +3,8 @@
   "workspaces": [
     "packages/connect-miniprogram",
     "packages/example-taro",
-    "packages/example-mina"
+    "packages/example-mina",
+    "packages/example-xhs"
   ],
   "scripts": {
     "build": "yarn workspace connect-miniprogram build",

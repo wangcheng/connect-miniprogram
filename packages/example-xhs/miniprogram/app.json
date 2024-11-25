@@ -1,0 +1,10 @@
+{
+  "pages": ["entry/index/index"],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "演示",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f7f7f7"
+  },
+  "appid": "63e30be6f5674e00017a4576"
+}

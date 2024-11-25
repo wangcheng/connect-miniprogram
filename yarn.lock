@@ -8171,6 +8171,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"example-xhs@workspace:packages/example-xhs":
+  version: 0.0.0-use.local
+  resolution: "example-xhs@workspace:packages/example-xhs"
+  dependencies:
+    "@buf/connectrpc_eliza.bufbuild_es": "npm:^2.2.2-20230913231627-233fca715f49.2"
+    "@bufbuild/protobuf": "npm:^2.2.0"
+    "@connectrpc/connect": "npm:~2.0.0"
+    connect-miniprogram: "workspace:packages/connect-miniprogram"
+    esbuild: "npm:^0.24.0"
+  languageName: unknown
+  linkType: soft
+
 "execa@npm:^5.0.0":
   version: 5.1.1
   resolution: "execa@npm:5.1.1"
