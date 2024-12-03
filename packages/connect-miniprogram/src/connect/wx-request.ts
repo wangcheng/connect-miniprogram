@@ -112,8 +112,12 @@ function create(
 }
 
 async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
+  const firstChunk = await iterator.next();
+  if (firstChunk.done || firstChunk.value.name !== 'HeadersReceived') {
+    throw new Error('missing header');
+  }
   // first value is header
-  const headerChunk = (await iterator.next()).value as HeadersReceivedEvent;
+  const { statusCode, header } = firstChunk.value.payload;
 
   async function* messageStream() {
     for await (const value of iterator) {
@@ -123,8 +127,8 @@ async function demuxStream(iterator: AsyncGenerator<RequestEvent>) {
   }
 
   return {
-    statusCode: headerChunk.payload.statusCode,
-    header: new Headers(headerChunk?.payload.header),
+    statusCode: statusCode,
+    header: new Headers(header),
     messageStream: createEnvelopeAsyncGenerator(messageStream()),
   };
 }
@@ -133,7 +137,7 @@ export function createWxRequestAsAsyncGenerator({
   request,
   isDevTool,
   requestOptions,
-}: CreateTransportOptions) {
+}: Pick<CreateTransportOptions, 'request' | 'isDevTool' | 'requestOptions'>) {
   /**
    * Weixin devtool has a bug if enableChunked is true.
    * https://developers.weixin.qq.com/community/develop/doc/000e44fc464560a0a6bf4188f56800
@@ -145,7 +149,10 @@ export function createWxRequestAsAsyncGenerator({
 }
 
 export function createWxRequestAsPromise(
-  { request, requestOptions }: CreateTransportOptions,
+  {
+    request,
+    requestOptions,
+  }: Pick<CreateTransportOptions, 'request' | 'requestOptions'>,
   useBinaryFormat: boolean,
 ) {
   return (options: PartialOptions) =>
