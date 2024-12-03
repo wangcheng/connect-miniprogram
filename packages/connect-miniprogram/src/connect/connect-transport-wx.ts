@@ -35,7 +35,7 @@ import {
   validateResponse,
 } from '@connectrpc/connect/protocol-connect';
 
-import { warnUnsupportedOptions } from './compatbility';
+import { warnUnsupportedOptions } from './compatibility';
 import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
 import {
@@ -86,7 +86,7 @@ export function createConnectTransport(
       );
 
       // start of custom code
-      // `normalize` is called in `runUnaryCall` in the upstream implementation. becuase we don't support runUnaryCall, we need to call normalize here
+      // `normalize` is called in `runUnaryCall` in the upstream implementation. because we don't support runUnaryCall, we need to call normalize here
       const reqMessage = normalize(method.input, message);
 
       const body = serialize(reqMessage);

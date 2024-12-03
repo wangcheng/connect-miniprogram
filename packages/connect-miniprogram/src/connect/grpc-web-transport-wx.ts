@@ -32,7 +32,7 @@ import {
   validateTrailer,
 } from '@connectrpc/connect/protocol-grpc-web';
 
-import { warnUnsupportedOptions } from './compatbility';
+import { warnUnsupportedOptions } from './compatibility';
 import { normalize, normalizeIterable } from './protocol/normalize';
 import type { CreateTransportOptions } from './types';
 import { createWxRequestAsAsyncGenerator } from './wx-request';
