@@ -21,7 +21,9 @@ jobs:
           cache-dependency-path: 'yarn.lock'
           registry-url: https://registry.npmjs.org/
       - run: yarn
-      - run: yarn workspace connect-miniprogram run build
-      - run: yarn workspace example-mina test-build-result
+      - run: yarn run lint
+      - run: yarn run test
+      - run: yarn run build
+      - run: yarn run test-build-result
       - run: yarn config set npmAuthToken ${{secrets.NPM_TOKEN}}
       - run: yarn workspace connect-miniprogram npm publish

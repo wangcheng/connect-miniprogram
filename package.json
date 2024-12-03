@@ -6,6 +6,7 @@
     "packages/example-mina"
   ],
   "scripts": {
+    "lint": "yarn workspace connect-miniprogram lint",
     "test": "yarn workspace connect-miniprogram jest",
     "build": "yarn workspace connect-miniprogram build",
     "dev:taro": "yarn workspace example-taro dev:weapp",
