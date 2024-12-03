@@ -6,8 +6,10 @@
     "packages/example-mina"
   ],
   "scripts": {
+    "test": "yarn workspace connect-miniprogram jest",
     "build": "yarn workspace connect-miniprogram build",
-    "dev:taro": "yarn workspace example-taro dev:weapp"
+    "dev:taro": "yarn workspace example-taro dev:weapp",
+    "test-build-result": "yarn workspace example-mina test-build-result"
   },
   "prettier": {
     "arrowParens": "always",
