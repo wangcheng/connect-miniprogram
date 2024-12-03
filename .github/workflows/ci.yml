@@ -20,5 +20,7 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'yarn.lock'
       - run: yarn
-      - run: yarn workspace connect-miniprogram run build
-      - run: yarn workspace example-mina test-build-result
+      - run: yarn run lint
+      - run: yarn run test
+      - run: yarn run build
+      - run: yarn run test-build-result
